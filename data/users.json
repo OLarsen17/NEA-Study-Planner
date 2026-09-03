@@ -1,0 +1,14 @@
+[
+    {
+        "username": "user123",
+        "password": "testpassword123",
+        "tasks": [],
+        "settings": {
+            "theme": "light",
+            "font_size": "medium",
+            "high_contrast": false,
+            "reminders_enabled": true,
+            "reminder_days": 3
+        }
+    }
+]

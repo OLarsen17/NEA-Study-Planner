@@ -2,7 +2,18 @@
     {
         "username": "user123",
         "password": "testpassword123",
-        "tasks": [],
+        "tasks": [
+            {
+                "id": null,
+                "title": "Chemistry - Bonding",
+                "subject": "Chemistry",
+                "deadline": "31/08/2026",
+                "duration": 45,
+                "confidence_rating": 4,
+                "completed": false,
+                "reminder_sent": false
+            }
+        ],
         "settings": {
             "theme": "light",
             "font_size": "medium",

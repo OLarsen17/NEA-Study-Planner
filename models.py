@@ -27,6 +27,14 @@ class Task:
             "reminder_sent": self.reminder_sent
         }
 
+    @staticmethod #means this method belongs to the class itself, not to any particular object
+    def from_dict(data):
+        task = Task(data["title"], data["subject"], data["deadline"], data["duration"], data["confidence_rating"])
+        task.id = data["id"]
+        task.completed = data["completed"]
+        task.reminder_sent = data["reminder_sent"]
+        return task
+
 class Settings: #simple version to be reference from user
     def __init__(self):
         self.theme = "light"
@@ -43,6 +51,16 @@ class Settings: #simple version to be reference from user
             "reminders_enabled": self.reminders_enabled,
             "reminder_days": self.reminder_days
         }
+
+    @staticmethod
+    def from_dict(data):
+        settings = Settings()
+        settings.theme = data["theme"]
+        settings.font_size = data["font_size"]
+        settings.high_contrast = data["high_contrast"]
+        settings.reminders_enabled = data["reminders_enabled"]
+        settings.reminder_days = data["reminder_days"]
+        return settings
 
 
 class User:
@@ -62,6 +80,13 @@ class User:
             "tasks": [task.to_dict() for task in self.tasks],
             "settings": self.settings.to_dict()
         }
+
+    @staticmethod
+    def from_dict(data):
+        user = User(data["username"], data["password"])
+        user.tasks = [Task.from_dict(t) for t in data["tasks"]]
+        user.settings = Settings.from_dict(data["settings"])
+        return user
 
 class StudySession:
     def __init__(self, task_id, start_time, end_time):

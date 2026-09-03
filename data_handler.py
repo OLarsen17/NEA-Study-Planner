@@ -11,22 +11,19 @@ def save_users(users):
         json.dump(data, file, indent=4) #makes the JSON file easier to read
 
 
-def load_users(): #just empty simplified version
-    if not os.path.exists(DATA_FILE): #checks wether JSON file exists so it doesnt crash first time run
+def load_users():
+    if not os.path.exists(DATA_FILE):
         return []
 
     with open(DATA_FILE, "r") as file:
         data = json.load(file)
 
-    users = []
-    for user_data in data:
-        user = User(user_data["username"], user_data["password"])
-        users.append(user)
-
-    return users
+    return [User.from_dict(user_data) for user_data in data]
 
 if __name__ == "__main__":
     test_user = User("user123", "testpassword123")
+    test_task = Task("Chemistry - Bonding", "Chemistry", "31/08/2026", 45, confidence_rating=4)
+    test_user.add_task(test_task)
     save_users([test_user])
 
     loaded = load_users()

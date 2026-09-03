@@ -24,6 +24,44 @@ class Task:
             "reminder_sent": self.reminder_sent
         }
 
+class Settings: #simple version to be reference from user
+    def __init__(self):
+        self.theme = "light"
+        self.font_size = "medium"
+        self.high_contrast = False
+        self.reminders_enabled = True
+        self.reminder_days = 3
+
+    def to_dict(self):
+        return {
+            "theme": self.theme,
+            "font_size": self.font_size,
+            "high_contrast": self.high_contrast,
+            "reminders_enabled": self.reminders_enabled,
+            "reminder_days": self.reminder_days
+        }
+
+
+class User:
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+        self.tasks = []
+        self.settings = Settings()
+
+    def add_task(self, task):
+        self.tasks.append(task)
+
+    def to_dict(self):
+        return {
+            "username": self.username,
+            "password": self.password,
+            "tasks": [task.to_dict() for task in self.tasks],
+            "settings": self.settings.to_dict()
+        }
+
 if __name__ == "__main__":
+    test_user = User("user123", "testpassword123")
     test_task = Task("Chemistry - Bonding", "Chemistry", "31/08/2026", 45, confidence_rating=4)
-    print(test_task.to_dict())
+    test_user.add_task(test_task)
+    print(test_user.to_dict())

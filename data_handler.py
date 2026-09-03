@@ -1,6 +1,7 @@
 import json
 import os
 from models import User, Task, StudySession, Settings
+from datetime import datetime, timedelta
 
 DATA_FILE = "data/users.json"
 
@@ -24,7 +25,12 @@ if __name__ == "__main__":
     test_user = User("user123", "testpassword123")
     test_task = Task("Chemistry - Bonding", "Chemistry", "31/08/2026", 45, confidence_rating=4)
     test_user.add_task(test_task)
-    save_users([test_user])
 
+    start = datetime.now()
+    end = start + timedelta(minutes=42)
+    test_session = StudySession(task_id=test_task.id, start_time=start, end_time=end)
+    test_user.add_session(test_session)
+
+    save_users([test_user])
     loaded = load_users()
     print(loaded[0].to_dict())

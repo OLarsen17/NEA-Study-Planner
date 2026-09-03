@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+
+
 class Task:
     def __init__(self, title, subject, deadline, duration, confidence_rating=3): #default confidence to 3 so it doesnt crash (middle confidence)
         self.id = None
@@ -60,8 +63,34 @@ class User:
             "settings": self.settings.to_dict()
         }
 
+class StudySession:
+    def __init__(self, task_id, start_time, end_time):
+        self.id = None
+        self.task_id = task_id
+        self.start_time = start_time
+        self.end_time = end_time
+        self.duration = self.calculate_duration()
+
+    def calculate_duration(self):
+        return int((self.end_time - self.start_time).total_seconds() // 60) #makes it a whole number
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "task_id": self.task_id,
+            "start_time": str(self.start_time), #needs to be strings for JSON file
+            "end_time": str(self.end_time), #needs to be strings for JSON file
+            "duration": self.duration
+        }
+
 if __name__ == "__main__":
     test_user = User("user123", "testpassword123")
     test_task = Task("Chemistry - Bonding", "Chemistry", "31/08/2026", 45, confidence_rating=4)
     test_user.add_task(test_task)
+
+    start = datetime.now()
+    end = start + timedelta(minutes=42)
+    test_session = StudySession(task_id=test_task.id, start_time=start, end_time=end)
+
     print(test_user.to_dict())
+    print(test_session.to_dict())

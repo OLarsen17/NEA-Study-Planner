@@ -87,7 +87,7 @@ class RevisionPlannerApp:
         entered_password = self.password_entry.get()
 
         if entered_password == self.pending_user.password:
-            messagebox.showinfo("Login Success", "Login successful! (Dashboard coming soon)")
+            self.show_dashboard()
         else:
             messagebox.showerror("Login Error", "That password isn't right. Please try again.")
 
@@ -144,6 +144,38 @@ class RevisionPlannerApp:
 
         messagebox.showinfo("Account Created", "Account created successfully! You can now log in.")
         self.show_welcome_screen()
+
+    def show_dashboard(self):
+        self.clear_screen()
+
+        welcome_label = tk.Label(self.root, text=f"Welcome back, {self.pending_user.username}", font=("Segoe UI", 16))
+        welcome_label.pack(pady=10)
+
+        subtitle_label = tk.Label(self.root, text="Here's what's coming up")
+        subtitle_label.pack()
+
+        deadlines_label = tk.Label(self.root, text="Upcoming Deadlines", font=("Segoe UI", 12))
+        deadlines_label.pack(pady=10)
+
+        upcoming_tasks = self.get_upcoming_tasks()
+
+        if not upcoming_tasks: #makes sure it doesnt crash if user has no tasks
+            no_tasks_label = tk.Label(self.root, text="No upcoming deadlines")
+            no_tasks_label.pack()
+        else:
+            for task in upcoming_tasks:
+                task_text = f"{task.title} — Due {task.deadline}"
+                task_label = tk.Label(self.root, text=task_text)
+                task_label.pack()
+
+    def get_upcoming_tasks(self): #filters out completed tasks
+        upcoming = []
+
+        for task in self.pending_user.tasks:
+            if not task.completed:
+                upcoming.append(task)
+
+        return upcoming
 
 if __name__ == "__main__":
     root = tk.Tk()

@@ -30,5 +30,18 @@
             "reminders_enabled": true,
             "reminder_days": 3
         }
+    },
+    {
+        "username": "newuser",
+        "password": "testpassword321",
+        "tasks": [],
+        "sessions": [],
+        "settings": {
+            "theme": "light",
+            "font_size": "medium",
+            "high_contrast": false,
+            "reminders_enabled": true,
+            "reminder_days": 3
+        }
     }
 ]

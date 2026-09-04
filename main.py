@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
-from data_handler import load_users
+
+from data_handler import load_users, save_users
+from models import User
 
 
 class RevisionPlannerApp:
@@ -27,7 +29,7 @@ class RevisionPlannerApp:
         login_button = tk.Button(self.root, text="Login", command=self.show_login_screen)
         login_button.pack(pady=10)
 
-        create_account_button = tk.Button(self.root, text="Create Account")
+        create_account_button = tk.Button(self.root, text="Create Account", command=self.show_create_account_screen)
         create_account_button.pack(pady=5)
 
     def show_login_screen(self):
@@ -89,6 +91,59 @@ class RevisionPlannerApp:
         else:
             messagebox.showerror("Login Error", "That password isn't right. Please try again.")
 
+    def show_create_account_screen(self):
+        self.clear_screen()
+
+        label = tk.Label(self.root, text="Create Account", font=("Segoe UI", 16))
+        label.pack(pady=10)
+
+        username_label = tk.Label(self.root, text="Username")
+        username_label.pack()
+        self.new_username_entry = tk.Entry(self.root)
+        self.new_username_entry.pack(pady=5)
+
+        password_label = tk.Label(self.root, text="Password")
+        password_label.pack()
+        self.new_password_entry = tk.Entry(self.root, show="*")
+        self.new_password_entry.pack(pady=5)
+
+        confirm_label = tk.Label(self.root, text="Confirm Password")
+        confirm_label.pack()
+        self.confirm_password_entry = tk.Entry(self.root, show="*")
+        self.confirm_password_entry.pack(pady=5)
+
+        create_button = tk.Button(self.root, text="Create Account", command=self.create_account)
+        create_button.pack(pady=10)
+
+    def create_account(self):
+        username = self.new_username_entry.get()
+        password = self.new_password_entry.get()
+        confirm_password = self.confirm_password_entry.get()
+
+        if username == "" or password == "":
+            messagebox.showerror("Account Error", "Username and password cannot be blank.")
+            return
+
+        if len(password) < 8: #has to be longer than 8 for security
+            messagebox.showerror("Account Error", "Password must be at least 8 characters.")
+            return
+
+        if password != confirm_password:
+            messagebox.showerror("Account Error", "Passwords do not match.")
+            return
+
+        users = load_users()
+        for user in users:
+            if user.username == username:
+                messagebox.showerror("Account Error", "That username is already taken. Please choose another.")
+                return
+
+        new_user = User(username, password)
+        users.append(new_user)
+        save_users(users)
+
+        messagebox.showinfo("Account Created", "Account created successfully! You can now log in.")
+        self.show_welcome_screen()
 
 if __name__ == "__main__":
     root = tk.Tk()

@@ -4,6 +4,8 @@ from tkinter import messagebox
 from data_handler import load_users, save_users
 from models import User
 
+from datetime import datetime
+
 
 class RevisionPlannerApp:
     def __init__(self, root):
@@ -163,18 +165,34 @@ class RevisionPlannerApp:
             no_tasks_label = tk.Label(self.root, text="No upcoming deadlines")
             no_tasks_label.pack()
         else:
-            for task in upcoming_tasks:
-                task_text = f"{task.title} — Due {task.deadline}"
+            for task, days_remaining in upcoming_tasks:
+                if days_remaining < 0:
+                    urgency_text = "Overdue"
+                elif days_remaining == 0:
+                    urgency_text = "Due today"
+                elif days_remaining == 1:
+                    urgency_text = "Due tomorrow"
+                else:
+                    urgency_text = f"{days_remaining} days left"
+
+                task_text = f"{task.title} — Due {task.deadline} — {urgency_text}"
                 task_label = tk.Label(self.root, text=task_text)
                 task_label.pack()
 
-    def get_upcoming_tasks(self): #filters out completed tasks
+    def get_upcoming_tasks(self):
         upcoming = []
+        today = datetime.now().date()
 
         for task in self.pending_user.tasks:
-            if not task.completed:
-                upcoming.append(task)
+            if task.completed:
+                continue
 
+            deadline_date = datetime.strptime(task.deadline, "%d/%m/%Y").date() #formats it nicely
+            days_remaining = (deadline_date - today).days
+
+            upcoming.append((task, days_remaining)) #stored as tuples because needed for sorting
+
+        upcoming.sort(key=lambda item: item[1]) #sorts in order of urgency
         return upcoming
 
 if __name__ == "__main__":

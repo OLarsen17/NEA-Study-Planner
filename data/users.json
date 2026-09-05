@@ -38,6 +38,30 @@
                 "completed": true,
                 "reminder_sent": false,
                 "elapsed_seconds": 0
+            },
+            {
+                "id": null,
+                "title": "Personal statement",
+                "subject": "UCAS",
+                "deadline": "08/09/2026",
+                "duration": 40,
+                "confidence_rating": 2,
+                "initial_confidence_rating": 2,
+                "completed": false,
+                "reminder_sent": true,
+                "elapsed_seconds": 0
+            },
+            {
+                "id": null,
+                "title": "Study Chem topic 1",
+                "subject": "Chemistry",
+                "deadline": "06/09/2026",
+                "duration": 120,
+                "confidence_rating": 3,
+                "initial_confidence_rating": 3,
+                "completed": false,
+                "reminder_sent": true,
+                "elapsed_seconds": 0
             }
         ],
         "sessions": [
@@ -163,8 +187,8 @@
             }
         ],
         "settings": {
-            "theme": "dark",
-            "font_size": "large",
+            "theme": "light",
+            "font_size": "medium",
             "high_contrast": false,
             "reminders_enabled": true,
             "reminder_days": 7

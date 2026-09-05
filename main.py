@@ -155,6 +155,7 @@ class RevisionPlannerApp:
         self.show_welcome_screen()
 
     def show_dashboard(self):
+        self.check_reminders()
         self.clear_screen()
 
         welcome_label = tk.Label(self.root, text=f"Welcome back, {self.pending_user.username}", font=("Segoe UI", 16))
@@ -746,6 +747,38 @@ class RevisionPlannerApp:
 
         messagebox.showinfo("Settings Saved", "Your settings have been saved.")
         self.show_dashboard()
+
+    def check_reminders(self):
+        if not self.pending_user.settings.reminders_enabled:
+            return
+
+        today = datetime.now().date()
+        reminder_days = self.pending_user.settings.reminder_days
+
+        for task in self.pending_user.tasks:
+            if task.completed or task.reminder_sent:
+                continue
+
+            deadline_date = datetime.strptime(task.deadline, "%d/%m/%Y").date()
+            days_remaining = (deadline_date - today).days
+
+            if days_remaining <= reminder_days:
+                self.show_reminder_popup(task, days_remaining)
+                task.reminder_sent = True
+
+        self.save_current_user()
+
+    def show_reminder_popup(self, task, days_remaining):
+        if days_remaining < 0:
+            message = f"{task.title} is overdue."
+        elif days_remaining == 0:
+            message = f"{task.title} is due today."
+        elif days_remaining == 1:
+            message = f"{task.title} is due tomorrow."
+        else:
+            message = f"{task.title} is due in {days_remaining} days."
+
+        messagebox.showinfo("Reminder", message)
 
 if __name__ == "__main__":
     root = tk.Tk()

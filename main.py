@@ -6,6 +6,8 @@ from models import User, Task
 
 from datetime import datetime
 
+from tkinter import ttk
+
 
 
 
@@ -216,7 +218,8 @@ class RevisionPlannerApp:
 
         subject_label = tk.Label(self.root, text="Subject")
         subject_label.pack()
-        self.task_subject_entry = tk.Entry(self.root)
+        existing_subjects = self.get_existing_subjects()
+        self.task_subject_entry = ttk.Combobox(self.root, values=existing_subjects)
         self.task_subject_entry.pack(pady=5)
 
         deadline_label = tk.Label(self.root, text="Deadline (DD/MM/YYYY)")
@@ -239,6 +242,13 @@ class RevisionPlannerApp:
 
         cancel_button = tk.Button(self.root, text="Cancel", command=self.show_dashboard)
         cancel_button.pack(pady=5)
+
+    def get_existing_subjects(self):
+        subjects = []
+        for task in self.pending_user.tasks:
+            if task.subject not in subjects:
+                subjects.append(task.subject)
+        return subjects
 
     def save_task(self):
         title = self.task_title_entry.get()

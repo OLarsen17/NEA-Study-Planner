@@ -34,3 +34,11 @@ Noticed that deleting all tasks in a subject removes that subject from the Add/E
 Considered storing subjects as their own persistent list on the User object, so a subject would remain available even with zero current tasks. Decided against this, since it would require building a separate mechanism to remove subjects a user no longer studies, otherwise the list would grow indefinitely with abandoned subjects over time. The added complexity was judged disproportionate to the fairly minor inconvenience of retyping a subject name in the rare case all of its tasks are deleted at once.
 
 Decision: subjects remain derived directly from existing tasks, as originally implemented.
+
+
+## Ideas and convenience features to consider later
+
+- Statistics comparing actual time studied (from StudySession data) against each task's estimated duration — directly supports the core project aim of helping students recognise when they misjudge task length. Higher priority, belongs naturally in the Statistics module.
+- Bind the Enter key to submit on Login and Password screens, so pressing Enter has the same effect as clicking Continue.
+- Auto-login toggle in Settings — flagged for further thought before building, since it raises a genuine security/privacy trade-off (bypassing password entry) that may conflict with the system being designed for multiple people sharing one device.
+- Statistics showing which tasks saw an improved confidence rating versus which stayed the same or dropped, using the initial_confidence_rating vs confidence_rating fields already built for the Study Timer.

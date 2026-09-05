@@ -54,7 +54,28 @@
     {
         "username": "newuser",
         "password": "testpassword321",
-        "tasks": [],
+        "tasks": [
+            {
+                "id": null,
+                "title": "bio sheet",
+                "subject": "Biology",
+                "deadline": "16/9/2026",
+                "duration": 30,
+                "confidence_rating": 4,
+                "completed": false,
+                "reminder_sent": false
+            },
+            {
+                "id": null,
+                "title": "coding",
+                "subject": "Computer Science",
+                "deadline": "6/09/2026",
+                "duration": 45,
+                "confidence_rating": 4,
+                "completed": false,
+                "reminder_sent": false
+            }
+        ],
         "sessions": [],
         "settings": {
             "theme": "light",

@@ -697,7 +697,7 @@ class RevisionPlannerApp:
         theme_label = tk.Label(self.root, text="Theme")
         theme_label.pack()
         self.theme_var = tk.StringVar(value=settings.theme)
-        theme_menu = tk.OptionMenu(self.root, self.theme_var, "light", "dark", "high_contrast")
+        theme_menu = tk.OptionMenu(self.root, self.theme_var, "light", "dark")
         theme_menu.pack(pady=5)
 
         font_size_label = tk.Label(self.root, text="Font size")
@@ -705,6 +705,10 @@ class RevisionPlannerApp:
         self.font_size_var = tk.StringVar(value=settings.font_size)
         font_size_menu = tk.OptionMenu(self.root, self.font_size_var, "small", "medium", "large")
         font_size_menu.pack(pady=5)
+
+        self.high_contrast_var = tk.BooleanVar(value=settings.high_contrast)
+        high_contrast_checkbox = tk.Checkbutton(self.root, text="High Contrast Mode", variable=self.high_contrast_var)
+        high_contrast_checkbox.pack(pady=5)
 
         reminders_label = tk.Label(self.root, text="Reminders", font=("Segoe UI", 12))
         reminders_label.pack(pady=(15, 0))
@@ -734,6 +738,7 @@ class RevisionPlannerApp:
 
         self.pending_user.settings.theme = self.theme_var.get()
         self.pending_user.settings.font_size = self.font_size_var.get()
+        self.pending_user.settings.high_contrast = self.high_contrast_var.get()
         self.pending_user.settings.reminders_enabled = self.reminders_enabled_var.get()
         self.pending_user.settings.reminder_days = int(reminder_days_text)
 

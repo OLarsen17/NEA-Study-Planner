@@ -2,9 +2,11 @@ import tkinter as tk
 from tkinter import messagebox
 
 from data_handler import load_users, save_users
-from models import User
+from models import User, Task
 
 from datetime import datetime
+
+
 
 
 class RevisionPlannerApp:
@@ -179,6 +181,9 @@ class RevisionPlannerApp:
                 task_label = tk.Label(self.root, text=task_text)
                 task_label.pack()
 
+        add_task_button = tk.Button(self.root, text="+ Add new task", command=self.show_add_task_screen) #add task button
+        add_task_button.pack(pady=10)
+
     def get_upcoming_tasks(self):
         upcoming = []
         today = datetime.now().date()
@@ -194,6 +199,81 @@ class RevisionPlannerApp:
 
         upcoming.sort(key=lambda item: item[1]) #sorts in order of urgency
         return upcoming
+
+    def show_add_task_screen(self):
+        self.clear_screen()
+
+        label = tk.Label(self.root, text="Add New Task", font=("Segoe UI", 16))
+        label.pack(pady=10)
+
+        title_label = tk.Label(self.root, text="Task Title")
+        title_label.pack()
+        self.task_title_entry = tk.Entry(self.root)
+        self.task_title_entry.pack(pady=5)
+
+        subject_label = tk.Label(self.root, text="Subject")
+        subject_label.pack()
+        self.task_subject_entry = tk.Entry(self.root)
+        self.task_subject_entry.pack(pady=5)
+
+        deadline_label = tk.Label(self.root, text="Deadline (DD/MM/YYYY)")
+        deadline_label.pack()
+        self.task_deadline_entry = tk.Entry(self.root)
+        self.task_deadline_entry.pack(pady=5)
+
+        duration_label = tk.Label(self.root, text="Estimated Study Time (mins)")
+        duration_label.pack()
+        self.task_duration_entry = tk.Entry(self.root)
+        self.task_duration_entry.pack(pady=5)
+
+        confidence_label = tk.Label(self.root, text="Confidence Rating (1-5)")
+        confidence_label.pack()
+        self.task_confidence_entry = tk.Entry(self.root)
+        self.task_confidence_entry.pack(pady=5)
+
+        save_button = tk.Button(self.root, text="Save Task", command=self.save_task)
+        save_button.pack(pady=10)
+
+        cancel_button = tk.Button(self.root, text="Cancel", command=self.show_dashboard)
+        cancel_button.pack(pady=5)
+
+    def save_task(self):
+        title = self.task_title_entry.get()
+        subject = self.task_subject_entry.get()
+        deadline = self.task_deadline_entry.get()
+        duration_text = self.task_duration_entry.get()
+        confidence_text = self.task_confidence_entry.get()
+
+        if title == "" or subject == "":
+            messagebox.showerror("Add Task Error", "Task title and subject cannot be blank.")
+            return
+
+        try: #try/except to prevent crashing
+            datetime.strptime(deadline, "%d/%m/%Y")
+        except ValueError:
+            messagebox.showerror("Add Task Error", "Deadline must be in the format DD/MM/YYYY.")
+            return
+
+        if not duration_text.isdigit() or int(duration_text) <= 0:
+            messagebox.showerror("Add Task Error", "Duration must be a positive number.")
+            return
+
+        if not confidence_text.isdigit() or not (1 <= int(confidence_text) <= 5): #makes sure if user types a letter it doesnt crash
+            messagebox.showerror("Add Task Error", "Confidence rating must be between 1 and 5.")
+            return
+
+        new_task = Task(title, subject, deadline, int(duration_text), int(confidence_text))
+        self.pending_user.tasks.append(new_task)
+
+        users = load_users()
+        for i, user in enumerate(users):
+            if user.username == self.pending_user.username:
+                users[i] = self.pending_user
+
+        save_users(users)
+
+        messagebox.showinfo("Task Added", "Task added successfully!")
+        self.show_dashboard()
 
 if __name__ == "__main__":
     root = tk.Tk()

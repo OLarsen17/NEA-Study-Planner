@@ -12,6 +12,16 @@
                 "confidence_rating": 4,
                 "completed": false,
                 "reminder_sent": false
+            },
+            {
+                "id": null,
+                "title": "Trigonometry",
+                "subject": "Maths",
+                "deadline": "06/10/2026",
+                "duration": 40,
+                "confidence_rating": 3,
+                "completed": false,
+                "reminder_sent": false
             }
         ],
         "sessions": [

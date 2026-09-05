@@ -34,7 +34,7 @@
                 "confidence_rating": 3,
                 "completed": false,
                 "reminder_sent": false,
-                "elapsed_seconds": 0
+                "elapsed_seconds": 1
             },
             {
                 "id": null,
@@ -43,7 +43,7 @@
                 "deadline": "30/09/2026",
                 "duration": 60,
                 "confidence_rating": 2,
-                "completed": false,
+                "completed": true,
                 "reminder_sent": false,
                 "elapsed_seconds": 0
             },
@@ -54,6 +54,28 @@
                 "deadline": "12/09/2026",
                 "duration": 40,
                 "confidence_rating": 3,
+                "completed": true,
+                "reminder_sent": false,
+                "elapsed_seconds": 0
+            },
+            {
+                "id": null,
+                "title": "Chem question pack",
+                "subject": "Chemistry",
+                "deadline": "16/09/2026",
+                "duration": 30,
+                "confidence_rating": 5,
+                "completed": true,
+                "reminder_sent": false,
+                "elapsed_seconds": 0
+            },
+            {
+                "id": null,
+                "title": "Bio write up",
+                "subject": "Biology",
+                "deadline": "17/09/2026",
+                "duration": 20,
+                "confidence_rating": 4,
                 "completed": true,
                 "reminder_sent": false,
                 "elapsed_seconds": 0
@@ -131,6 +153,38 @@
                 "end_time": "2026-09-05T20:22:34.126617",
                 "duration": 0,
                 "duration_seconds": 19
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T20:35:08.249698",
+                "end_time": "2026-09-05T20:35:17.249698",
+                "duration": 0,
+                "duration_seconds": 9
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T20:36:33.314342",
+                "end_time": "2026-09-05T20:36:34.314342",
+                "duration": 0,
+                "duration_seconds": 1
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T20:59:05.442470",
+                "end_time": "2026-09-05T21:00:12.442470",
+                "duration": 1,
+                "duration_seconds": 67
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T21:01:49.339543",
+                "end_time": "2026-09-05T21:03:37.339543",
+                "duration": 1,
+                "duration_seconds": 108
             }
         ],
         "settings": {

@@ -1,2 +1,3 @@
 statistics comparing how long you took compared to estimated
 press enter button to continue on login and password screens
+auto login toggle in settings?

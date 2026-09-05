@@ -195,6 +195,9 @@ class RevisionPlannerApp:
         timer_button = tk.Button(self.root, text="Study Timer", command=self.show_timer_task_select_screen)
         timer_button.pack(pady=5)
 
+        settings_button = tk.Button(self.root, text="Settings", command=self.show_settings_screen)
+        settings_button.pack(pady=5)
+
     def get_upcoming_tasks(self):
         upcoming = []
         today = datetime.now().date()
@@ -679,6 +682,65 @@ class RevisionPlannerApp:
             if user.username == self.pending_user.username:
                 users[i] = self.pending_user
         save_users(users)
+
+    def show_settings_screen(self):
+        self.clear_screen()
+
+        label = tk.Label(self.root, text="Settings", font=("Segoe UI", 16))
+        label.pack(pady=10)
+
+        settings = self.pending_user.settings
+
+        appearance_label = tk.Label(self.root, text="Appearance", font=("Segoe UI", 12))
+        appearance_label.pack(pady=(10, 0))
+
+        theme_label = tk.Label(self.root, text="Theme")
+        theme_label.pack()
+        self.theme_var = tk.StringVar(value=settings.theme)
+        theme_menu = tk.OptionMenu(self.root, self.theme_var, "light", "dark", "high_contrast")
+        theme_menu.pack(pady=5)
+
+        font_size_label = tk.Label(self.root, text="Font size")
+        font_size_label.pack()
+        self.font_size_var = tk.StringVar(value=settings.font_size)
+        font_size_menu = tk.OptionMenu(self.root, self.font_size_var, "small", "medium", "large")
+        font_size_menu.pack(pady=5)
+
+        reminders_label = tk.Label(self.root, text="Reminders", font=("Segoe UI", 12))
+        reminders_label.pack(pady=(15, 0))
+
+        self.reminders_enabled_var = tk.BooleanVar(value=settings.reminders_enabled)
+        reminders_checkbox = tk.Checkbutton(self.root, text="Enable reminders", variable=self.reminders_enabled_var)
+        reminders_checkbox.pack(pady=5)
+
+        reminder_days_label = tk.Label(self.root, text="Remind me this many days before a deadline")
+        reminder_days_label.pack()
+        self.reminder_days_entry = tk.Entry(self.root)
+        self.reminder_days_entry.insert(0, str(settings.reminder_days))
+        self.reminder_days_entry.pack(pady=5)
+
+        save_button = tk.Button(self.root, text="Save Settings", command=self.save_settings)
+        save_button.pack(pady=15)
+
+        back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
+        back_button.pack(pady=5)
+
+    def save_settings(self):
+        reminder_days_text = self.reminder_days_entry.get()
+
+        if not reminder_days_text.isdigit() or not (1 <= int(reminder_days_text) <= 14):
+            messagebox.showerror("Settings Error", "Reminder days must be a whole number between 1 and 14.")
+            return
+
+        self.pending_user.settings.theme = self.theme_var.get()
+        self.pending_user.settings.font_size = self.font_size_var.get()
+        self.pending_user.settings.reminders_enabled = self.reminders_enabled_var.get()
+        self.pending_user.settings.reminder_days = int(reminder_days_text)
+
+        self.save_current_user()
+
+        messagebox.showinfo("Settings Saved", "Your settings have been saved.")
+        self.show_dashboard()
 
 if __name__ == "__main__":
     root = tk.Tk()

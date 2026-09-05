@@ -163,11 +163,11 @@
             }
         ],
         "settings": {
-            "theme": "light",
-            "font_size": "medium",
+            "theme": "dark",
+            "font_size": "large",
             "high_contrast": false,
             "reminders_enabled": true,
-            "reminder_days": 3
+            "reminder_days": 7
         }
     },
     {

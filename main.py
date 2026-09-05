@@ -261,18 +261,22 @@ class RevisionPlannerApp:
             messagebox.showerror("Add Task Error", "Task title and subject cannot be blank.")
             return
 
-        try: #try/except to prevent crashing
-            datetime.strptime(deadline, "%d/%m/%Y")
-        except ValueError:
+        date_parts = deadline.split("/")
+
+        if len(date_parts) != 3 or not all(part.isdigit() for part in date_parts):
             messagebox.showerror("Add Task Error", "Deadline must be in the format DD/MM/YYYY.")
             return
 
-        if not duration_text.isdigit() or int(duration_text) <= 0:
-            messagebox.showerror("Add Task Error", "Duration must be a positive number.")
+        day, month, year = date_parts
+
+        if len(year) != 4:
+            messagebox.showerror("Add Task Error", "Deadline must be in the format DD/MM/YYYY.")
             return
 
-        if not confidence_text.isdigit() or not (1 <= int(confidence_text) <= 5): #makes sure if user types a letter it doesnt crash
-            messagebox.showerror("Add Task Error", "Confidence rating must be between 1 and 5.")
+        try:
+            datetime.strptime(deadline, "%d/%m/%Y")
+        except ValueError:
+            messagebox.showerror("Add Task Error", "That date doesn't exist. Please check the day and month.")
             return
 
         new_task = Task(title, subject, deadline, int(duration_text), int(confidence_text))
@@ -416,18 +420,22 @@ class RevisionPlannerApp:
             messagebox.showerror("Edit Task Error", "Task title and subject cannot be blank.")
             return
 
+        date_parts = deadline.split("/")
+
+        if len(date_parts) != 3 or not all(part.isdigit() for part in date_parts):
+            messagebox.showerror("Add Task Error", "Deadline must be in the format DD/MM/YYYY.")
+            return
+
+        day, month, year = date_parts
+
+        if len(year) != 4:
+            messagebox.showerror("Add Task Error", "Deadline must be in the format DD/MM/YYYY.")
+            return
+
         try:
             datetime.strptime(deadline, "%d/%m/%Y")
         except ValueError:
-            messagebox.showerror("Edit Task Error", "Deadline must be in the format DD/MM/YYYY.")
-            return
-
-        if not duration_text.isdigit() or int(duration_text) <= 0:
-            messagebox.showerror("Edit Task Error", "Duration must be a positive number.")
-            return
-
-        if not confidence_text.isdigit() or not (1 <= int(confidence_text) <= 5):
-            messagebox.showerror("Edit Task Error", "Confidence rating must be between 1 and 5.")
+            messagebox.showerror("Edit Task Error", "That date doesn't exist. Please check the day and month.")
             return
 
         self.editing_task.title = title

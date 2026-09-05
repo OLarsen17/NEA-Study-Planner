@@ -5,16 +5,6 @@
         "tasks": [
             {
                 "id": null,
-                "title": "Chemistry - Bonding",
-                "subject": "Chemistry",
-                "deadline": "31/08/2026",
-                "duration": 45,
-                "confidence_rating": 4,
-                "completed": false,
-                "reminder_sent": false
-            },
-            {
-                "id": null,
                 "title": "Trigonometry",
                 "subject": "Maths",
                 "deadline": "06/10/2026",
@@ -35,11 +25,11 @@
             },
             {
                 "id": null,
-                "title": "NEA Design Section",
+                "title": "NEA Development Section",
                 "subject": "Computer Science",
-                "deadline": "08/09/2026",
-                "duration": 20,
-                "confidence_rating": 4,
+                "deadline": "16/10/2026",
+                "duration": 6000,
+                "confidence_rating": 3,
                 "completed": false,
                 "reminder_sent": false
             }

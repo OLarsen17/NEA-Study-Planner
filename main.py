@@ -361,6 +361,106 @@ class RevisionPlannerApp:
             delete_button = tk.Button(row, text="Delete", command=lambda t=task: self.confirm_delete_task(t))
             delete_button.pack(side="right", padx=2)
 
+    def show_edit_task_screen(self, task):
+        self.clear_screen()
+        self.editing_task = task
+
+        label = tk.Label(self.root, text="Edit Task", font=("Segoe UI", 16))
+        label.pack(pady=10)
+
+        title_label = tk.Label(self.root, text="Task Title")
+        title_label.pack()
+        self.edit_title_entry = tk.Entry(self.root)
+        self.edit_title_entry.insert(0, task.title) #inserts existing text to be edited
+        self.edit_title_entry.pack(pady=5)
+
+        subject_label = tk.Label(self.root, text="Subject")
+        subject_label.pack()
+        existing_subjects = self.get_existing_subjects()
+        self.edit_subject_entry = ttk.Combobox(self.root, values=existing_subjects)
+        self.edit_subject_entry.insert(0, task.subject)
+        self.edit_subject_entry.pack(pady=5)
+
+        deadline_label = tk.Label(self.root, text="Deadline (DD/MM/YYYY)")
+        deadline_label.pack()
+        self.edit_deadline_entry = tk.Entry(self.root)
+        self.edit_deadline_entry.insert(0, task.deadline)
+        self.edit_deadline_entry.pack(pady=5)
+
+        duration_label = tk.Label(self.root, text="Estimated Study Time (mins)")
+        duration_label.pack()
+        self.edit_duration_entry = tk.Entry(self.root)
+        self.edit_duration_entry.insert(0, str(task.duration))
+        self.edit_duration_entry.pack(pady=5)
+
+        confidence_label = tk.Label(self.root, text="Confidence Rating (1-5)")
+        confidence_label.pack()
+        self.edit_confidence_entry = tk.Entry(self.root)
+        self.edit_confidence_entry.insert(0, str(task.confidence_rating))
+        self.edit_confidence_entry.pack(pady=5)
+
+        save_button = tk.Button(self.root, text="Save Changes", command=self.save_edited_task)
+        save_button.pack(pady=10)
+
+        cancel_button = tk.Button(self.root, text="Cancel", command=self.show_task_list_screen)
+        cancel_button.pack(pady=5)
+
+    def save_edited_task(self):
+        title = self.edit_title_entry.get()
+        subject = self.edit_subject_entry.get()
+        deadline = self.edit_deadline_entry.get()
+        duration_text = self.edit_duration_entry.get()
+        confidence_text = self.edit_confidence_entry.get()
+
+        if title == "" or subject == "":
+            messagebox.showerror("Edit Task Error", "Task title and subject cannot be blank.")
+            return
+
+        try:
+            datetime.strptime(deadline, "%d/%m/%Y")
+        except ValueError:
+            messagebox.showerror("Edit Task Error", "Deadline must be in the format DD/MM/YYYY.")
+            return
+
+        if not duration_text.isdigit() or int(duration_text) <= 0:
+            messagebox.showerror("Edit Task Error", "Duration must be a positive number.")
+            return
+
+        if not confidence_text.isdigit() or not (1 <= int(confidence_text) <= 5):
+            messagebox.showerror("Edit Task Error", "Confidence rating must be between 1 and 5.")
+            return
+
+        self.editing_task.title = title
+        self.editing_task.subject = subject
+        self.editing_task.deadline = deadline
+        self.editing_task.duration = int(duration_text)
+        self.editing_task.confidence_rating = int(confidence_text)
+
+        users = load_users()
+        for i, user in enumerate(users):
+            if user.username == self.pending_user.username:
+                users[i] = self.pending_user
+
+        save_users(users)
+
+        messagebox.showinfo("Task Updated", "Task updated successfully!")
+        self.show_task_list_screen()
+
+    def confirm_delete_task(self, task):
+        confirmed = messagebox.askyesno("Confirm Delete", "Are you sure you want to delete this task? This action cannot be undone.") #makes sure user doesnt accidentally delete a task
+        if confirmed:
+            self.pending_user.tasks.remove(task) #removes it from json task list
+
+            users = load_users()
+            for i, user in enumerate(users):
+                if user.username == self.pending_user.username:
+                    users[i] = self.pending_user
+
+            save_users(users)
+
+            messagebox.showinfo("Task Deleted", "Task deleted successfully.")
+            self.show_task_list_screen()
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = RevisionPlannerApp(root)

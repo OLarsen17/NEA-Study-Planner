@@ -296,6 +296,7 @@ class RevisionPlannerApp:
 
         self.sort_var = tk.StringVar(value="Deadline") #
         self.filter_var = tk.StringVar(value="Incomplete Only")
+        self.subject_filter_var = tk.StringVar(value="All Subjects")
 
         controls_frame = tk.Frame(self.root)
         controls_frame.pack(pady=5)
@@ -305,6 +306,10 @@ class RevisionPlannerApp:
 
         filter_menu = tk.OptionMenu(controls_frame, self.filter_var, "Incomplete Only", "Complete Only", "All", command=lambda _: self.refresh_task_list())
         filter_menu.pack(side="left", padx=5)
+
+        subject_options = ["All Subjects"] + self.get_existing_subjects()
+        subject_filter_menu = tk.OptionMenu(controls_frame, self.subject_filter_var, *subject_options, command=lambda _: self.refresh_task_list())
+        subject_filter_menu.pack(side="left", padx=5)
 
         self.task_list_frame = tk.Frame(self.root)
         self.task_list_frame.pack(pady=10)
@@ -325,6 +330,10 @@ class RevisionPlannerApp:
             tasks = [t for t in tasks if not t.completed]
         elif filter_choice == "Complete Only":
             tasks = [t for t in tasks if t.completed]
+
+        subject_choice = self.subject_filter_var.get()
+        if subject_choice != "All Subjects":
+            tasks = [t for t in tasks if t.subject == subject_choice] 
 
         sort_choice = self.sort_var.get()
         if sort_choice == "Deadline":

@@ -357,7 +357,15 @@ class RevisionPlannerApp:
             row = tk.Frame(self.task_list_frame)
             row.pack(fill="x", pady=2)
 
-            info_text = f"{task.title} — {task.subject} — Due {task.deadline}"
+            if task.completed:
+                if task.confidence_rating != task.initial_confidence_rating:
+                    confidence_text = f"Confidence: {task.initial_confidence_rating} → {task.confidence_rating}"
+                else:
+                    confidence_text = f"Confidence: {task.confidence_rating}"
+            else:
+                confidence_text = f"Confidence: {task.confidence_rating}"
+
+            info_text = f"{task.title} — {task.subject} — Due {task.deadline} — {confidence_text}"
             info_label = tk.Label(row, text=info_text)
             info_label.pack(side="left", padx=5)
 

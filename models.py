@@ -12,6 +12,7 @@ class Task:
         self.completed = False #defaulted to False becasue it hasnt happened yet
         self.reminder_sent = False #defaulted to False becasue it hasnt happened yet
         self.elapsed_seconds = 0
+        self.initial_confidence_rating = confidence_rating
         
     def mark_complete(self):
         self.completed = True
@@ -24,6 +25,7 @@ class Task:
             "deadline": self.deadline,
             "duration": self.duration,
             "confidence_rating": self.confidence_rating,
+            "initial_confidence_rating": self.initial_confidence_rating,
             "completed": self.completed,
             "reminder_sent": self.reminder_sent,
             "elapsed_seconds": self.elapsed_seconds
@@ -36,6 +38,7 @@ class Task:
         task.completed = data["completed"]
         task.reminder_sent = data["reminder_sent"]
         task.elapsed_seconds = data.get("elapsed_seconds", 0)
+        task.initial_confidence_rating = data.get("initial_confidence_rating", data["confidence_rating"])
         return task
 
 class Settings: #simple version to be reference from user

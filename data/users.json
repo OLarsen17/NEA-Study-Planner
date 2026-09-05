@@ -5,77 +5,36 @@
         "tasks": [
             {
                 "id": null,
-                "title": "Trigonometry",
-                "subject": "Maths",
-                "deadline": "06/10/2026",
-                "duration": 40,
-                "confidence_rating": 3,
-                "completed": true,
-                "reminder_sent": false,
-                "elapsed_seconds": 0
-            },
-            {
-                "id": null,
-                "title": "Chem question pack",
-                "subject": "Chemistry",
-                "deadline": "29/09/2026",
-                "duration": 75,
-                "confidence_rating": 4,
-                "completed": true,
-                "reminder_sent": false,
-                "elapsed_seconds": 0
-            },
-            {
-                "id": null,
                 "title": "NEA Development Section",
                 "subject": "Computer Science",
                 "deadline": "16/10/2026",
                 "duration": 6000,
                 "confidence_rating": 3,
+                "initial_confidence_rating": 3,
                 "completed": false,
                 "reminder_sent": false,
                 "elapsed_seconds": 1
             },
             {
                 "id": null,
-                "title": "Revision",
-                "subject": "Chemistry",
-                "deadline": "30/09/2026",
-                "duration": 60,
-                "confidence_rating": 2,
-                "completed": true,
-                "reminder_sent": false,
-                "elapsed_seconds": 0
-            },
-            {
-                "id": null,
-                "title": "Chem question pack",
-                "subject": "Chemistry",
-                "deadline": "12/09/2026",
-                "duration": 40,
-                "confidence_rating": 3,
-                "completed": true,
-                "reminder_sent": false,
-                "elapsed_seconds": 0
-            },
-            {
-                "id": null,
-                "title": "Chem question pack",
-                "subject": "Chemistry",
-                "deadline": "16/09/2026",
-                "duration": 30,
-                "confidence_rating": 5,
-                "completed": true,
-                "reminder_sent": false,
-                "elapsed_seconds": 0
-            },
-            {
-                "id": null,
-                "title": "Bio write up",
-                "subject": "Biology",
-                "deadline": "17/09/2026",
-                "duration": 20,
+                "title": "Finish Art Coursework",
+                "subject": "Art",
+                "deadline": "25/10/2026",
+                "duration": 70,
                 "confidence_rating": 4,
+                "initial_confidence_rating": 2,
+                "completed": true,
+                "reminder_sent": false,
+                "elapsed_seconds": 0
+            },
+            {
+                "id": null,
+                "title": "Maths Questions",
+                "subject": "Maths",
+                "deadline": "22/12/2026",
+                "duration": 30,
+                "confidence_rating": 4,
+                "initial_confidence_rating": 4,
                 "completed": true,
                 "reminder_sent": false,
                 "elapsed_seconds": 0
@@ -185,6 +144,22 @@
                 "end_time": "2026-09-05T21:03:37.339543",
                 "duration": 1,
                 "duration_seconds": 108
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T21:17:33.418408",
+                "end_time": "2026-09-05T21:17:51.418408",
+                "duration": 0,
+                "duration_seconds": 18
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T21:20:13.876762",
+                "end_time": "2026-09-05T21:20:16.876762",
+                "duration": 0,
+                "duration_seconds": 3
             }
         ],
         "settings": {
@@ -206,6 +181,7 @@
                 "deadline": "16/9/2026",
                 "duration": 30,
                 "confidence_rating": 4,
+                "initial_confidence_rating": 4,
                 "completed": false,
                 "reminder_sent": false,
                 "elapsed_seconds": 0
@@ -217,6 +193,7 @@
                 "deadline": "6/09/2026",
                 "duration": 45,
                 "confidence_rating": 4,
+                "initial_confidence_rating": 4,
                 "completed": false,
                 "reminder_sent": false,
                 "elapsed_seconds": 0

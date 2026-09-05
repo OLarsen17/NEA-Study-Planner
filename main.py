@@ -2,11 +2,12 @@ import tkinter as tk
 from tkinter import messagebox
 
 from data_handler import load_users, save_users
-from models import User, Task
+from models import User, Task, StudySession
 
 from datetime import datetime
 
 from tkinter import ttk
+
 
 
 
@@ -188,6 +189,9 @@ class RevisionPlannerApp:
 
         view_tasks_button = tk.Button(self.root, text="View all tasks", command=self.show_task_list_screen)
         view_tasks_button.pack(pady=5)
+
+        timer_button = tk.Button(self.root, text="Study Timer", command=self.show_timer_task_select_screen)
+        timer_button.pack(pady=5)
 
     def get_upcoming_tasks(self):
         upcoming = []
@@ -468,6 +472,102 @@ class RevisionPlannerApp:
 
             messagebox.showinfo("Task Deleted", "Task deleted successfully.")
             self.show_task_list_screen()
+
+    def show_timer_task_select_screen(self):
+        self.clear_screen()
+
+        label = tk.Label(self.root, text="Select a task to study", font=("Segoe UI", 16))
+        label.pack(pady=10)
+
+        incomplete_tasks = [t for t in self.pending_user.tasks if not t.completed]
+
+        if not incomplete_tasks:
+            no_tasks_label = tk.Label(self.root, text="No incomplete tasks to study")
+            no_tasks_label.pack()
+        else:
+            for task in incomplete_tasks:
+                task_button = tk.Button(self.root, text=f"{task.title} ({task.subject})", command=lambda t=task: self.start_timer(t))
+                task_button.pack(pady=3)
+
+        back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
+        back_button.pack(pady=10)
+
+    def start_timer(self, task):
+        self.timer_task = task
+        self.timer_start_time = datetime.now()
+        self.timer_running = True
+
+        self.clear_screen()
+
+        studying_label = tk.Label(self.root, text="Currently studying", font=("Segoe UI", 10))
+        studying_label.pack(pady=(10, 0))
+
+        task_label = tk.Label(self.root, text=task.title, font=("Segoe UI", 16))
+        task_label.pack()
+
+        self.timer_display_label = tk.Label(self.root, text="00:00", font=("Segoe UI", 36))
+        self.timer_display_label.pack(pady=20)
+
+        target_label = tk.Label(self.root, text=f"Target: {task.duration} minutes")
+        target_label.pack()
+
+        stop_button = tk.Button(self.root, text="Stop and finish", command=self.stop_timer)
+        stop_button.pack(pady=15)
+
+        self.update_timer_display()
+
+    def update_timer_display(self):
+        if not self.timer_running: #check if timers been stopped
+            return
+
+        elapsed = datetime.now() - self.timer_start_time
+        total_seconds = int(elapsed.total_seconds())
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+
+        self.timer_display_label.config(text=f"{minutes:02d}:{seconds:02d}") #formats it to xx:xx rather than x:x so it pads it with zeros
+
+        self.root.after(1000, self.update_timer_display) #after 1 second it updates the timer by calling the function
+
+    def stop_timer(self):
+        self.timer_running = False
+        end_time = datetime.now()
+
+        session = StudySession(task_id=self.timer_task.id, start_time=self.timer_start_time, end_time=end_time)
+        self.pending_user.sessions.append(session)
+
+        self.clear_screen()
+
+        finished_label = tk.Label(self.root, text="Session finished", font=("Segoe UI", 16))
+        finished_label.pack(pady=10)
+
+        task_label = tk.Label(self.root, text=self.timer_task.title)
+        task_label.pack()
+
+        time_label = tk.Label(self.root, text=f"Time studied: {session.duration} minutes", font=("Segoe UI", 14))
+        time_label.pack(pady=15)
+
+        complete_label = tk.Label(self.root, text="Is this task complete?")
+        complete_label.pack()
+
+        yes_button = tk.Button(self.root, text="Yes, mark complete", command=lambda: self.finish_session(mark_complete=True))
+        yes_button.pack(pady=3)
+
+        no_button = tk.Button(self.root, text="Not yet", command=lambda: self.finish_session(mark_complete=False))
+        no_button.pack(pady=3)
+
+    def finish_session(self, mark_complete):
+        if mark_complete:
+            self.timer_task.completed = True
+
+        users = load_users()
+        for i, user in enumerate(users):
+            if user.username == self.pending_user.username:
+                users[i] = self.pending_user
+
+        save_users(users)
+
+        self.show_dashboard()
 
 if __name__ == "__main__":
     root = tk.Tk()

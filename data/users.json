@@ -10,7 +10,7 @@
                 "deadline": "06/10/2026",
                 "duration": 40,
                 "confidence_rating": 3,
-                "completed": false,
+                "completed": true,
                 "reminder_sent": false
             },
             {
@@ -41,6 +41,20 @@
                 "start_time": "2026-09-03T19:53:59.395292",
                 "end_time": "2026-09-03T20:35:59.395292",
                 "duration": 42
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T15:22:29.485290",
+                "end_time": "2026-09-05T15:23:16.983681",
+                "duration": 0
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T15:23:25.008372",
+                "end_time": "2026-09-05T15:24:27.013872",
+                "duration": 1
             }
         ],
         "settings": {

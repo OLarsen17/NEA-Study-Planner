@@ -184,6 +184,9 @@ class RevisionPlannerApp:
         add_task_button = tk.Button(self.root, text="+ Add new task", command=self.show_add_task_screen) #add task button
         add_task_button.pack(pady=10)
 
+        view_tasks_button = tk.Button(self.root, text="View all tasks", command=self.show_task_list_screen)
+        view_tasks_button.pack(pady=5)
+
     def get_upcoming_tasks(self):
         upcoming = []
         today = datetime.now().date()
@@ -274,6 +277,70 @@ class RevisionPlannerApp:
 
         messagebox.showinfo("Task Added", "Task added successfully!")
         self.show_dashboard()
+
+    def show_task_list_screen(self):
+        self.clear_screen()
+
+        label = tk.Label(self.root, text="Your Tasks", font=("Segoe UI", 16))
+        label.pack(pady=10)
+
+        self.sort_var = tk.StringVar(value="Deadline") #
+        self.filter_var = tk.StringVar(value="Incomplete Only")
+
+        controls_frame = tk.Frame(self.root)
+        controls_frame.pack(pady=5)
+
+        sort_menu = tk.OptionMenu(controls_frame, self.sort_var, "Deadline", "Name", "Duration", command=lambda _: self.refresh_task_list()) #dropdown widget
+        sort_menu.pack(side="left", padx=5)
+
+        filter_menu = tk.OptionMenu(controls_frame, self.filter_var, "Incomplete Only", "Complete Only", "All", command=lambda _: self.refresh_task_list())
+        filter_menu.pack(side="left", padx=5)
+
+        self.task_list_frame = tk.Frame(self.root)
+        self.task_list_frame.pack(pady=10)
+
+        self.refresh_task_list() #refreshes what was sorted
+
+        back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
+        back_button.pack(pady=10)
+
+    def refresh_task_list(self):
+        for widget in self.task_list_frame.winfo_children():
+            widget.destroy()
+
+        tasks = self.pending_user.tasks
+
+        filter_choice = self.filter_var.get()
+        if filter_choice == "Incomplete Only":
+            tasks = [t for t in tasks if not t.completed]
+        elif filter_choice == "Complete Only":
+            tasks = [t for t in tasks if t.completed]
+
+        sort_choice = self.sort_var.get()
+        if sort_choice == "Deadline":
+            tasks = sorted(tasks, key=lambda t: datetime.strptime(t.deadline, "%d/%m/%Y"))
+        elif sort_choice == "Name":
+            tasks = sorted(tasks, key=lambda t: t.title)
+        elif sort_choice == "Duration":
+            tasks = sorted(tasks, key=lambda t: t.duration)
+
+        if not tasks:
+            no_tasks_label = tk.Label(self.task_list_frame, text="No tasks to show")
+            no_tasks_label.pack()
+
+        for task in tasks:
+            row = tk.Frame(self.task_list_frame)
+            row.pack(fill="x", pady=2)
+
+            info_text = f"{task.title} — {task.subject} — Due {task.deadline}"
+            info_label = tk.Label(row, text=info_text)
+            info_label.pack(side="left", padx=5)
+
+            edit_button = tk.Button(row, text="Edit", command=lambda t=task: self.show_edit_task_screen(t))
+            edit_button.pack(side="right", padx=2)
+
+            delete_button = tk.Button(row, text="Delete", command=lambda t=task: self.confirm_delete_task(t))
+            delete_button.pack(side="right", padx=2)
 
 if __name__ == "__main__":
     root = tk.Tk()

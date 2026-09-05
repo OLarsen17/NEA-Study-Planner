@@ -11,7 +11,8 @@ class Task:
         self.confidence_rating = confidence_rating
         self.completed = False #defaulted to False becasue it hasnt happened yet
         self.reminder_sent = False #defaulted to False becasue it hasnt happened yet
-
+        self.elapsed_seconds = 0
+        
     def mark_complete(self):
         self.completed = True
 
@@ -24,7 +25,8 @@ class Task:
             "duration": self.duration,
             "confidence_rating": self.confidence_rating,
             "completed": self.completed,
-            "reminder_sent": self.reminder_sent
+            "reminder_sent": self.reminder_sent,
+            "elapsed_seconds": self.elapsed_seconds
         }
 
     @staticmethod #means this method belongs to the class itself, not to any particular object
@@ -33,6 +35,7 @@ class Task:
         task.id = data["id"]
         task.completed = data["completed"]
         task.reminder_sent = data["reminder_sent"]
+        task.elapsed_seconds = data.get("elapsed_seconds", 0)
         return task
 
 class Settings: #simple version to be reference from user
@@ -125,7 +128,7 @@ class StudySession:
         return session
 
 if __name__ == "__main__":
-    test_user = User("alex123", "revisegood2026")
+    test_user = User("user123", "testpassword123")
     test_task = Task("Chemistry - Bonding", "Chemistry", "31/08/2026", 45, confidence_rating=4)
     test_user.add_task(test_task)
 

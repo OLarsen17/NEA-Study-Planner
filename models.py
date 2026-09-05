@@ -104,6 +104,7 @@ class StudySession:
         self.start_time = start_time
         self.end_time = end_time
         self.duration = self.calculate_duration()
+        self.duration_seconds = self.duration * 60
 
     def calculate_duration(self):
         return int((self.end_time - self.start_time).total_seconds() // 60) #makes it a whole number
@@ -114,7 +115,8 @@ class StudySession:
             "task_id": self.task_id,
             "start_time": self.start_time.isoformat(), #save times in a format fromisoformaat can read (it's a method on Python's datetime objects that converts a date/time into a standard text format like "2026-08-31T14:23:05.123456")
             "end_time": self.end_time.isoformat(),
-            "duration": self.duration
+            "duration": self.duration,
+            "duration_seconds": self.duration_seconds
         }
 
     @staticmethod
@@ -125,6 +127,7 @@ class StudySession:
             end_time=datetime.fromisoformat(data["end_time"])
         )
         session.id = data["id"]
+        session.duration_seconds = data.get("duration_seconds", data["duration"] * 60)
         return session
 
 if __name__ == "__main__":

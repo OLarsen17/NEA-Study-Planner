@@ -4,7 +4,7 @@ from tkinter import messagebox
 from data_handler import load_users, save_users
 from models import User, Task, StudySession
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from tkinter import ttk
 
@@ -286,12 +286,7 @@ class RevisionPlannerApp:
         new_task = Task(title, subject, deadline, int(duration_text), int(confidence_text))
         self.pending_user.tasks.append(new_task)
 
-        users = load_users()
-        for i, user in enumerate(users):
-            if user.username == self.pending_user.username:
-                users[i] = self.pending_user
-
-        save_users(users)
+        self.save_current_user()
 
         messagebox.showinfo("Task Added", "Task added successfully!")
         self.show_dashboard()
@@ -301,6 +296,9 @@ class RevisionPlannerApp:
 
         label = tk.Label(self.root, text="Your Tasks", font=("Segoe UI", 16))
         label.pack(pady=10)
+
+        add_task_button = tk.Button(self.root, text="+ Add new task", command=self.show_add_task_screen)
+        add_task_button.pack(pady=5)
 
         self.sort_var = tk.StringVar(value="Deadline") #
         self.filter_var = tk.StringVar(value="Incomplete Only")
@@ -448,12 +446,7 @@ class RevisionPlannerApp:
         self.editing_task.duration = int(duration_text)
         self.editing_task.confidence_rating = int(confidence_text)
 
-        users = load_users()
-        for i, user in enumerate(users):
-            if user.username == self.pending_user.username:
-                users[i] = self.pending_user
-
-        save_users(users)
+        self.save_current_user()
 
         messagebox.showinfo("Task Updated", "Task updated successfully!")
         self.show_task_list_screen()
@@ -463,12 +456,7 @@ class RevisionPlannerApp:
         if confirmed:
             self.pending_user.tasks.remove(task) #removes it from json task list
 
-            users = load_users()
-            for i, user in enumerate(users):
-                if user.username == self.pending_user.username:
-                    users[i] = self.pending_user
-
-            save_users(users)
+            self.save_current_user()
 
             messagebox.showinfo("Task Deleted", "Task deleted successfully.")
             self.show_task_list_screen()
@@ -486,11 +474,67 @@ class RevisionPlannerApp:
             no_tasks_label.pack()
         else:
             for task in incomplete_tasks:
-                task_button = tk.Button(self.root, text=f"{task.title} ({task.subject})", command=lambda t=task: self.start_timer(t))
+                if task.elapsed_seconds > 0:
+                    minutes_so_far = task.elapsed_seconds // 60
+                    button_text = f"{task.title} ({task.subject}) — {minutes_so_far} min saved"
+                else:
+                    button_text = f"{task.title} ({task.subject})"
+
+                task_button = tk.Button(self.root, text=button_text, command=lambda t=task: self.open_timer_screen(t))
                 task_button.pack(pady=3)
 
         back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
         back_button.pack(pady=10)
+
+    def open_timer_screen(self, task):
+        self.timer_task = task
+        self.timer_running = False
+        self.sitting_seconds = 0
+        self.timer_session_start = None
+
+        self.clear_screen()
+
+        studying_label = tk.Label(self.root, text="Currently studying", font=("Segoe UI", 10))
+        studying_label.pack(pady=(10, 0))
+
+        task_label = tk.Label(self.root, text=task.title, font=("Segoe UI", 16))
+        task_label.pack()
+
+        self.timer_display_label = tk.Label(self.root, text=self.format_time(task.elapsed_seconds), font=("Segoe UI", 36))
+        self.timer_display_label.pack(pady=20)
+
+        target_label = tk.Label(self.root, text=f"Target: {task.duration} minutes")
+        target_label.pack()
+
+        controls_frame = tk.Frame(self.root)
+        controls_frame.pack(pady=10)
+
+        self.start_button = tk.Button(controls_frame, text="Start", command=self.start_timer)
+        self.start_button.pack(side="left", padx=5)
+
+        self.pause_button = tk.Button(controls_frame, text="Pause", command=self.pause_timer, state="disabled")
+        self.pause_button.pack(side="left", padx=5)
+
+        reset_sitting_button = tk.Button(controls_frame, text="Reset this sitting", command=self.reset_sitting)
+        reset_sitting_button.pack(side="left", padx=5)
+
+        if task.elapsed_seconds > 0:
+            reset_all_button = tk.Button(controls_frame, text="Reset all", command=self.reset_all_progress)
+            reset_all_button.pack(side="left", padx=5)
+
+        action_frame = tk.Frame(self.root)
+        action_frame.pack(pady=10)
+
+        continue_later_button = tk.Button(action_frame, text="Continue later", command=self.continue_later)
+        continue_later_button.pack(side="left", padx=5)
+
+        stop_button = tk.Button(action_frame, text="Stop and finish", command=self.stop_timer)
+        stop_button.pack(side="left", padx=5)
+
+    def format_time(self, total_seconds):
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        return f"{minutes:02d}:{seconds:02d}"
 
     def start_timer(self, task):
         self.timer_task = task
@@ -568,6 +612,120 @@ class RevisionPlannerApp:
         save_users(users)
 
         self.show_dashboard()
+
+    def start_timer(self):
+        self.timer_running = True
+        self.timer_session_start = datetime.now()
+
+        self.start_button.config(state="disabled")
+        self.pause_button.config(state="normal")
+
+        self.update_timer_display()
+
+    def pause_timer(self):
+        self.timer_running = False
+
+        just_elapsed = (datetime.now() - self.timer_session_start).total_seconds()
+        self.sitting_seconds += int(just_elapsed)
+
+        self.start_button.config(state="normal")
+        self.pause_button.config(state="disabled")
+
+    def update_timer_display(self):
+        if not self.timer_running:
+            return
+
+        if not self.timer_display_label.winfo_exists():
+            return
+
+        just_elapsed = (datetime.now() - self.timer_session_start).total_seconds()
+        current_total = self.timer_task.elapsed_seconds + self.sitting_seconds + int(just_elapsed)
+
+        self.timer_display_label.config(text=self.format_time(current_total))
+
+        self.root.after(1000, self.update_timer_display)
+
+    def reset_sitting(self):
+        self.timer_running = False
+        self.sitting_seconds = 0
+        self.timer_session_start = None
+
+        self.start_button.config(state="normal")
+        self.pause_button.config(state="disabled")
+
+        self.timer_display_label.config(text=self.format_time(self.timer_task.elapsed_seconds))
+
+    def reset_all_progress(self):
+        confirmed = messagebox.askyesno("Reset All Progress", "This will erase all previously saved time on this task, not just this sitting. Are you sure?")
+        if confirmed:
+            self.timer_task.elapsed_seconds = 0
+            self.reset_sitting()
+            self.save_current_user()
+
+    def get_current_sitting_seconds(self):
+        if self.timer_running:
+            just_elapsed = (datetime.now() - self.timer_session_start).total_seconds()
+            return self.sitting_seconds + int(just_elapsed)
+        else:
+            return self.sitting_seconds
+
+    def continue_later(self):
+        total_sitting_seconds = self.get_current_sitting_seconds()
+        self.timer_task.elapsed_seconds += total_sitting_seconds
+
+        self.save_current_user()
+        self.show_timer_task_select_screen()
+
+    def stop_timer(self):
+        total_seconds = self.timer_task.elapsed_seconds + self.get_current_sitting_seconds()
+
+        start_of_task = datetime.now() - timedelta(seconds=total_seconds)
+        session = StudySession(task_id=self.timer_task.id, start_time=start_of_task, end_time=datetime.now())
+        session.duration_seconds = total_seconds
+
+        self.pending_user.sessions.append(session)
+        self.last_session_total_seconds = total_seconds
+        self.timer_task.elapsed_seconds = 0
+
+        self.clear_screen()
+
+        finished_label = tk.Label(self.root, text="Session finished", font=("Segoe UI", 16))
+        finished_label.pack(pady=10)
+
+        task_label = tk.Label(self.root, text=self.timer_task.title)
+        task_label.pack()
+
+        time_label = tk.Label(self.root, text=f"Time studied: {self.format_time(total_seconds)}", font=("Segoe UI", 14))
+        time_label.pack(pady=15)
+
+        complete_label = tk.Label(self.root, text="Is this task complete?")
+        complete_label.pack()
+
+        yes_button = tk.Button(self.root, text="Yes, mark complete", command=lambda: self.finish_session(mark_complete=True))
+        yes_button.pack(pady=3)
+
+        no_button = tk.Button(self.root, text="Not yet", command=lambda: self.finish_session(mark_complete=False))
+        no_button.pack(pady=3)
+
+    def finish_session(self, mark_complete):
+        if mark_complete:
+            self.timer_task.completed = True
+        else:
+            self.timer_task.elapsed_seconds = self.last_session_total_seconds
+
+        self.save_current_user()
+
+        if mark_complete:
+            self.show_dashboard()
+        else:
+            self.open_timer_screen(self.timer_task)
+
+    def save_current_user(self):
+        users = load_users()
+        for i, user in enumerate(users):
+            if user.username == self.pending_user.username:
+                users[i] = self.pending_user
+        save_users(users)
 
 if __name__ == "__main__":
     root = tk.Tk()

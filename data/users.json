@@ -11,7 +11,8 @@
                 "duration": 40,
                 "confidence_rating": 3,
                 "completed": true,
-                "reminder_sent": false
+                "reminder_sent": false,
+                "elapsed_seconds": 0
             },
             {
                 "id": null,
@@ -20,8 +21,9 @@
                 "deadline": "29/09/2026",
                 "duration": 75,
                 "confidence_rating": 4,
-                "completed": false,
-                "reminder_sent": false
+                "completed": true,
+                "reminder_sent": false,
+                "elapsed_seconds": 0
             },
             {
                 "id": null,
@@ -31,7 +33,30 @@
                 "duration": 6000,
                 "confidence_rating": 3,
                 "completed": false,
-                "reminder_sent": false
+                "reminder_sent": false,
+                "elapsed_seconds": 0
+            },
+            {
+                "id": null,
+                "title": "Revision",
+                "subject": "Chemistry",
+                "deadline": "30/09/2026",
+                "duration": 60,
+                "confidence_rating": 2,
+                "completed": false,
+                "reminder_sent": false,
+                "elapsed_seconds": 0
+            },
+            {
+                "id": null,
+                "title": "Chem question pack",
+                "subject": "Chemistry",
+                "deadline": "12/09/2026",
+                "duration": 40,
+                "confidence_rating": 3,
+                "completed": true,
+                "reminder_sent": false,
+                "elapsed_seconds": 0
             }
         ],
         "sessions": [
@@ -40,21 +65,72 @@
                 "task_id": null,
                 "start_time": "2026-09-03T19:53:59.395292",
                 "end_time": "2026-09-03T20:35:59.395292",
-                "duration": 42
+                "duration": 42,
+                "duration_seconds": 2520
             },
             {
                 "id": null,
                 "task_id": null,
                 "start_time": "2026-09-05T15:22:29.485290",
                 "end_time": "2026-09-05T15:23:16.983681",
-                "duration": 0
+                "duration": 0,
+                "duration_seconds": 0
             },
             {
                 "id": null,
                 "task_id": null,
                 "start_time": "2026-09-05T15:23:25.008372",
                 "end_time": "2026-09-05T15:24:27.013872",
-                "duration": 1
+                "duration": 1,
+                "duration_seconds": 60
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T16:19:08.834543",
+                "end_time": "2026-09-05T16:21:20.834543",
+                "duration": 2,
+                "duration_seconds": 132
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T16:21:32.994277",
+                "end_time": "2026-09-05T16:21:35.994277",
+                "duration": 0,
+                "duration_seconds": 3
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T16:22:44.791550",
+                "end_time": "2026-09-05T16:23:46.791550",
+                "duration": 1,
+                "duration_seconds": 62
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T20:16:08.858471",
+                "end_time": "2026-09-05T20:16:20.858471",
+                "duration": 0,
+                "duration_seconds": 12
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T20:16:33.693731",
+                "end_time": "2026-09-05T20:16:33.693731",
+                "duration": 0,
+                "duration_seconds": 0
+            },
+            {
+                "id": null,
+                "task_id": null,
+                "start_time": "2026-09-05T20:22:15.126617",
+                "end_time": "2026-09-05T20:22:34.126617",
+                "duration": 0,
+                "duration_seconds": 19
             }
         ],
         "settings": {
@@ -77,7 +153,8 @@
                 "duration": 30,
                 "confidence_rating": 4,
                 "completed": false,
-                "reminder_sent": false
+                "reminder_sent": false,
+                "elapsed_seconds": 0
             },
             {
                 "id": null,
@@ -87,7 +164,8 @@
                 "duration": 45,
                 "confidence_rating": 4,
                 "completed": false,
-                "reminder_sent": false
+                "reminder_sent": false,
+                "elapsed_seconds": 0
             }
         ],
         "sessions": [],

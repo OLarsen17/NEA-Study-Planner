@@ -1,3 +1,4 @@
 statistics comparing how long you took compared to estimated
 press enter button to continue on login and password screens
 auto login toggle in settings?
+statistics of like whatt task you improved conifdence on and which you didnt imporve confidence

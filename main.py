@@ -357,6 +357,10 @@ class RevisionPlannerApp:
             row = tk.Frame(self.task_list_frame)
             row.pack(fill="x", pady=2)
 
+            completed_var = tk.BooleanVar(value=task.completed)
+            complete_checkbox = tk.Checkbutton(row, variable=completed_var, command=lambda t=task, v=completed_var: self.toggle_task_complete(t, v))
+            complete_checkbox.pack(side="left")
+
             if task.completed:
                 if task.confidence_rating != task.initial_confidence_rating:
                     confidence_text = f"Confidence: {task.initial_confidence_rating} → {task.confidence_rating}"
@@ -374,6 +378,11 @@ class RevisionPlannerApp:
 
             delete_button = tk.Button(row, text="Delete", command=lambda t=task: self.confirm_delete_task(t))
             delete_button.pack(side="right", padx=2)
+
+    def toggle_task_complete(self, task, completed_var):
+        task.completed = completed_var.get()
+        self.save_current_user()
+        self.refresh_task_list()
 
     def show_edit_task_screen(self, task):
         self.clear_screen()

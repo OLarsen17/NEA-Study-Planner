@@ -50,6 +50,7 @@ class RevisionPlannerApp:
 
         self.username_entry = tk.Entry(self.root) #reads whatever user entered
         self.username_entry.pack(pady=5)
+        self.username_entry.bind("<Return>", lambda event: self.check_username())
 
         continue_button = tk.Button(self.root, text="Continue", command=self.check_username)
         continue_button.pack(pady=10)
@@ -86,6 +87,7 @@ class RevisionPlannerApp:
 
         self.password_entry = tk.Entry(self.root, show="*") #make sure password is not shown and shows * instead
         self.password_entry.pack(pady=5)
+        self.password_entry.bind("<Return>", lambda event: self.check_password())
 
         continue_button = tk.Button(self.root, text="Continue", command=self.check_password)
         continue_button.pack(pady=10)

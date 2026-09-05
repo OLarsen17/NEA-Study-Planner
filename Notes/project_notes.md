@@ -25,3 +25,12 @@ Plan: tackle points 1–7 as one connected rebuild of the timer screens, since t
 - Reminder popup logic (1.1 Check Upcoming Deadlines, 1.2 Send Reminder) — checking each task's deadline against the user's saved reminder_days setting and showing a popup where appropriate. Depends on the Settings screen existing first, since there needs to be a real, user-set reminder_days value to check against.
 - Statistics dashboard (6.3) — charts showing study time per subject and task completion.
 - Progress report screen (6.4) — written, subject-by-subject feedback generated from stored study and completion data.
+
+
+## Design decision: subjects remain tied to existing tasks only
+
+Noticed that deleting all tasks in a subject removes that subject from the Add/Edit Task dropdown, since subjects are derived dynamically from the user's current task list rather than being stored independently.
+
+Considered storing subjects as their own persistent list on the User object, so a subject would remain available even with zero current tasks. Decided against this, since it would require building a separate mechanism to remove subjects a user no longer studies, otherwise the list would grow indefinitely with abandoned subjects over time. The added complexity was judged disproportionate to the fairly minor inconvenience of retyping a subject name in the rare case all of its tasks are deleted at once.
+
+Decision: subjects remain derived directly from existing tasks, as originally implemented.

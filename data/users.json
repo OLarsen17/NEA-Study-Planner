@@ -26,6 +26,18 @@
                 "completed": true,
                 "reminder_sent": false,
                 "elapsed_seconds": 0
+            },
+            {
+                "id": "170f8866-160a-467d-9e92-6a0d36cccb86",
+                "title": "Biology questions",
+                "subject": "Biology",
+                "deadline": "06/10/2026",
+                "duration": 25,
+                "confidence_rating": 4,
+                "initial_confidence_rating": 4,
+                "completed": false,
+                "reminder_sent": false,
+                "elapsed_seconds": 0
             }
         ],
         "sessions": [

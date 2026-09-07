@@ -821,11 +821,17 @@ class RevisionPlannerApp:
         completed_count = len([t for t in tasks if t.completed])
         total_count = len(tasks)
 
+        if total_count > 0:
+            average_confidence = round(sum(t.confidence_rating for t in tasks) / total_count, 1)
+        else:
+            average_confidence = 0
+
         return {
             "total_seconds": total_seconds,
             "subject_totals": subject_totals,
             "completed_count": completed_count,
-            "total_count": total_count
+            "total_count": total_count,
+            "average_confidence": average_confidence
         }
 
     def print_test_statistics(self):
@@ -839,6 +845,7 @@ class RevisionPlannerApp:
         self.clear_screen()
 
         stats = self.calculate_statistics()
+        tasks = self.pending_user.tasks
 
         label = tk.Label(self.root, text="Statistics", font=("Segoe UI", 16))
         label.pack(pady=10)
@@ -852,24 +859,55 @@ class RevisionPlannerApp:
         completed_label = tk.Label(summary_frame, text=f"Tasks completed: {stats['completed_count']} / {stats['total_count']}")
         completed_label.pack()
 
-        chart_frame = tk.Frame(self.root)
-        chart_frame.pack(pady=10)
+        confidence_label = tk.Label(summary_frame, text=f"Average confidence: {stats['average_confidence']} / 5")
+        confidence_label.pack()
 
-        subjects = list(stats['subject_totals'].keys())
-        minutes = [seconds // 60 for seconds in stats['subject_totals'].values()]
+        charts_frame = tk.Frame(self.root)
+        charts_frame.pack(pady=10)
 
+        bar_frame = tk.Frame(charts_frame)
+        bar_frame.pack(side="left", padx=10)
+
+        subjects = list(set(t.subject for t in tasks) | set(stats['subject_totals'].keys()))
+        minutes = []
+        for subject in subjects:
+            seconds = stats['subject_totals'].get(subject, 0)
+            minutes.append(round(seconds / 60, 1))
+            
         if subjects:
-            figure = Figure(figsize=(4, 3), dpi=80)
-            ax = figure.add_subplot()
-            ax.bar(subjects, minutes)
-            ax.set_title("Time per subject (mins)")
+            bar_figure = Figure(figsize=(3.5, 3), dpi=80)
+            bar_ax = bar_figure.add_subplot()
+            bar_ax.bar(subjects, minutes)
+            bar_ax.set_title("Time per subject (mins)")
+            bar_ax.tick_params(axis='x', labelrotation=30)
+            bar_figure.tight_layout()
 
-            canvas = FigureCanvasTkAgg(figure, master=chart_frame)
-            canvas.draw()
-            canvas.get_tk_widget().pack()
+            bar_canvas = FigureCanvasTkAgg(bar_figure, master=bar_frame)
+            bar_canvas.draw()
+            bar_canvas.get_tk_widget().pack()
         else:
-            no_data_label = tk.Label(chart_frame, text="No study data yet")
-            no_data_label.pack()
+            no_bar_data_label = tk.Label(bar_frame, text="No study data yet")
+            no_bar_data_label.pack()
+
+        pie_frame = tk.Frame(charts_frame)
+        pie_frame.pack(side="left", padx=10)
+
+        if stats['total_count'] > 0:
+            pie_figure = Figure(figsize=(3.5, 3), dpi=80)
+            pie_ax = pie_figure.add_subplot()
+            pie_ax.pie(
+                [stats['completed_count'], stats['total_count'] - stats['completed_count']],
+                labels=["Completed", "Remaining"],
+                autopct="%1.0f%%"
+            )
+            pie_ax.set_title("Task completion")
+
+            pie_canvas = FigureCanvasTkAgg(pie_figure, master=pie_frame)
+            pie_canvas.draw()
+            pie_canvas.get_tk_widget().pack()
+        else:
+            no_pie_data_label = tk.Label(pie_frame, text="No tasks yet")
+            no_pie_data_label.pack()
 
         back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
         back_button.pack(pady=10)

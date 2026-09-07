@@ -1,9 +1,11 @@
 from datetime import datetime, timedelta
 
+import uuid
+
 
 class Task:
     def __init__(self, title, subject, deadline, duration, confidence_rating=3): #default confidence to 3 so it doesnt crash (middle confidence)
-        self.id = None
+        self.id = str(uuid.uuid4())
         self.title = title
         self.subject = subject
         self.deadline = deadline
@@ -101,9 +103,10 @@ class User:
         return user
 
 class StudySession:
-    def __init__(self, task_id, start_time, end_time):
-        self.id = None
+    def __init__(self, task_id, task_subject, start_time, end_time):
+        self.id = str(uuid.uuid4())
         self.task_id = task_id
+        self.task_subject = task_subject
         self.start_time = start_time
         self.end_time = end_time
         self.duration = self.calculate_duration()
@@ -119,13 +122,16 @@ class StudySession:
             "start_time": self.start_time.isoformat(), #save times in a format fromisoformaat can read (it's a method on Python's datetime objects that converts a date/time into a standard text format like "2026-08-31T14:23:05.123456")
             "end_time": self.end_time.isoformat(),
             "duration": self.duration,
-            "duration_seconds": self.duration_seconds
+            "duration_seconds": self.duration_seconds,
+            "task_id": self.task_id,
+            "task_subject": self.task_subject
         }
 
     @staticmethod
     def from_dict(data):
         session = StudySession(
             task_id=data["task_id"],
+            task_subject=data.get("task_subject", "Unknown"),
             start_time=datetime.fromisoformat(data["start_time"]), #needs to convert the time strings into real datetime objects
             end_time=datetime.fromisoformat(data["end_time"])
         )

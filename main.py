@@ -24,6 +24,8 @@ class RevisionPlannerApp:
         for widget in self.root.winfo_children():
             widget.destroy()
 
+    #-----LOGIN-----#
+
     def show_welcome_screen(self):
         self.clear_screen()
 
@@ -54,6 +56,9 @@ class RevisionPlannerApp:
 
         continue_button = tk.Button(self.root, text="Continue", command=self.check_username)
         continue_button.pack(pady=10)
+
+        create_account_link = tk.Button(self.root, text="Don't have an account? Create one", command=self.show_create_account_screen)
+        create_account_link.pack(pady=5)
 
     def check_username(self):
         entered_username = self.username_entry.get()
@@ -124,6 +129,9 @@ class RevisionPlannerApp:
         create_button = tk.Button(self.root, text="Create Account", command=self.create_account)
         create_button.pack(pady=10)
 
+        login_link = tk.Button(self.root, text="Already have an account? Log in", command=self.show_login_screen)
+        login_link.pack(pady=5)
+
     def create_account(self):
         username = self.new_username_entry.get()
         password = self.new_password_entry.get()
@@ -153,6 +161,8 @@ class RevisionPlannerApp:
 
         messagebox.showinfo("Account Created", "Account created successfully! You can now log in.")
         self.show_welcome_screen()
+
+    #-----DASHBOARD-----#
 
     def show_dashboard(self):
         self.check_reminders()
@@ -198,6 +208,9 @@ class RevisionPlannerApp:
 
         settings_button = tk.Button(self.root, text="Settings", command=self.show_settings_screen)
         settings_button.pack(pady=5)
+
+        test_stats_button = tk.Button(self.root, text="TEST: Print stats", command=self.print_test_statistics)
+        test_stats_button.pack(pady=5)
 
     def get_upcoming_tasks(self):
         upcoming = []
@@ -296,6 +309,8 @@ class RevisionPlannerApp:
 
         messagebox.showinfo("Task Added", "Task added successfully!")
         self.show_dashboard()
+
+    #-----TASKS SCREEN-----#
 
     def show_task_list_screen(self):
         self.clear_screen()
@@ -484,6 +499,8 @@ class RevisionPlannerApp:
             messagebox.showinfo("Task Deleted", "Task deleted successfully.")
             self.show_task_list_screen()
 
+    #-----STUDY TIMER-----#
+
     def show_timer_task_select_screen(self):
         self.clear_screen()
 
@@ -627,7 +644,7 @@ class RevisionPlannerApp:
         total_seconds = self.timer_task.elapsed_seconds + self.get_current_sitting_seconds()
 
         start_of_task = datetime.now() - timedelta(seconds=total_seconds)
-        session = StudySession(task_id=self.timer_task.id, start_time=start_of_task, end_time=datetime.now())
+        session = StudySession(task_id=self.timer_task.id, task_subject=self.timer_task.subject, start_time=start_of_task, end_time=datetime.now())
         session.duration_seconds = total_seconds
 
         self.pending_user.sessions.append(session)
@@ -683,6 +700,8 @@ class RevisionPlannerApp:
             if user.username == self.pending_user.username:
                 users[i] = self.pending_user
         save_users(users)
+
+    #-----SETTINGS-----#
 
     def show_settings_screen(self):
         self.clear_screen()
@@ -779,6 +798,36 @@ class RevisionPlannerApp:
             message = f"{task.title} is due in {days_remaining} days."
 
         messagebox.showinfo("Reminder", message)
+
+    #-----STATISTICS-----#
+
+    def calculate_statistics(self):
+        sessions = self.pending_user.sessions
+        tasks = self.pending_user.tasks
+
+        total_seconds = sum(getattr(s, "duration_seconds", s.duration * 60) for s in sessions)
+
+        subject_totals = {}
+        for session in sessions:
+            session_seconds = getattr(session, "duration_seconds", session.duration * 60)
+            subject = getattr(session, "task_subject", "Unknown")
+            subject_totals[subject] = subject_totals.get(subject, 0) + session_seconds
+        completed_count = len([t for t in tasks if t.completed])
+        total_count = len(tasks)
+
+        return {
+            "total_seconds": total_seconds,
+            "subject_totals": subject_totals,
+            "completed_count": completed_count,
+            "total_count": total_count
+        }
+
+    def print_test_statistics(self):
+        stats = self.calculate_statistics()
+        print(f"Total time: {self.format_time(stats['total_seconds'])}")
+        for subject, seconds in stats['subject_totals'].items():
+            print(f"{subject}: {self.format_time(seconds)}")
+        print(f"Completed: {stats['completed_count']} / {stats['total_count']}")
 
 if __name__ == "__main__":
     root = tk.Tk()

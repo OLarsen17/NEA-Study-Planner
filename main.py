@@ -8,6 +8,9 @@ from datetime import datetime, timedelta
 
 from tkinter import ttk
 
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 
 
 
@@ -209,8 +212,11 @@ class RevisionPlannerApp:
         settings_button = tk.Button(self.root, text="Settings", command=self.show_settings_screen)
         settings_button.pack(pady=5)
 
-        test_stats_button = tk.Button(self.root, text="TEST: Print stats", command=self.print_test_statistics)
-        test_stats_button.pack(pady=5)
+        #test_stats_button = tk.Button(self.root, text="TEST: Print stats", command=self.print_test_statistics)
+        #test_stats_button.pack(pady=5)
+
+        statistics_button = tk.Button(self.root, text="Statistics", command=self.show_statistics_screen)
+        statistics_button.pack(pady=5)
 
     def get_upcoming_tasks(self):
         upcoming = []
@@ -828,6 +834,45 @@ class RevisionPlannerApp:
         for subject, seconds in stats['subject_totals'].items():
             print(f"{subject}: {self.format_time(seconds)}")
         print(f"Completed: {stats['completed_count']} / {stats['total_count']}")
+
+    def show_statistics_screen(self):
+        self.clear_screen()
+
+        stats = self.calculate_statistics()
+
+        label = tk.Label(self.root, text="Statistics", font=("Segoe UI", 16))
+        label.pack(pady=10)
+
+        summary_frame = tk.Frame(self.root)
+        summary_frame.pack(pady=5)
+
+        total_time_label = tk.Label(summary_frame, text=f"Total study time: {self.format_time(stats['total_seconds'])}")
+        total_time_label.pack()
+
+        completed_label = tk.Label(summary_frame, text=f"Tasks completed: {stats['completed_count']} / {stats['total_count']}")
+        completed_label.pack()
+
+        chart_frame = tk.Frame(self.root)
+        chart_frame.pack(pady=10)
+
+        subjects = list(stats['subject_totals'].keys())
+        minutes = [seconds // 60 for seconds in stats['subject_totals'].values()]
+
+        if subjects:
+            figure = Figure(figsize=(4, 3), dpi=80)
+            ax = figure.add_subplot()
+            ax.bar(subjects, minutes)
+            ax.set_title("Time per subject (mins)")
+
+            canvas = FigureCanvasTkAgg(figure, master=chart_frame)
+            canvas.draw()
+            canvas.get_tk_widget().pack()
+        else:
+            no_data_label = tk.Label(chart_frame, text="No study data yet")
+            no_data_label.pack()
+
+        back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
+        back_button.pack(pady=10)
 
 if __name__ == "__main__":
     root = tk.Tk()

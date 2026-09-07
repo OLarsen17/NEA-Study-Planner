@@ -42,3 +42,22 @@ Decision: subjects remain derived directly from existing tasks, as originally im
 - Bind the Enter key to submit on Login and Password screens, so pressing Enter has the same effect as clicking Continue.
 - Auto-login toggle in Settings — flagged for further thought before building, since it raises a genuine security/privacy trade-off (bypassing password entry) that may conflict with the system being designed for multiple people sharing one device.
 - Statistics showing which tasks saw an improved confidence rating versus which stayed the same or dropped, using the initial_confidence_rating vs confidence_rating fields already built for the Study Timer.
+
+## Statistics screen structure — extending the original design
+
+While building the Statistics dashboard, decided to split statistics-related content across three distinct screens rather than one dense page, extending the original two-screen plan (Statistics dashboard + Progress report) with a third destination:
+
+- **Statistics dashboard** — the "quick glance" screen from the original mockup: summary numbers (total time, tasks completed, average confidence), a bar chart of time per subject, and a pie chart of task completion.
+- **More statistics/graphs** (new) — a dedicated screen for secondary, more detailed visual comparisons that don't belong on the quick-glance dashboard but are still chart-based rather than written: time studied vs. estimated duration per task, and confidence improvement across studied tasks. These were originally noted as convenience ideas rather than part of the initial screen design.
+- **Progress report** — unchanged from the original design; stays as the written, subject-by-subject feedback screen, no charts.
+
+Reasoning: keeping the dashboard limited to two charts avoids needing a scroller or cramped layout, matching the original mockup's intent as a quick, glanceable screen. The new "More statistics/graphs" screen gives the deeper visual comparisons a proper home without overloading the dashboard or forcing them awkwardly into the written Progress report.
+
+### Known issues and gaps identified while testing the first version
+
+- Bar chart uses whole-minute floor division (seconds // 60) to convert session time to minutes, which rounds any session under 60 seconds down to 0, making bars for short test sessions invisible. To be fixed using round(seconds / 60, 1) for one-decimal precision.
+- Average confidence rating was part of the original Statistics dashboard mockup but was missed when the screen was first built — only total time and completed count were included. To be added.
+- Pie chart (task completion split) was part of the original mockup but not yet built — dashboard currently only shows the bar chart. To be added.
+
+Plan: fix all three of the above together as one combined pass, then take a fresh, accurate set of screenshots of the completed dashboard.
+

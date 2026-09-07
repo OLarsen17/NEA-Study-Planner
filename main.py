@@ -128,6 +128,7 @@ class RevisionPlannerApp:
         confirm_label.pack()
         self.confirm_password_entry = tk.Entry(self.root, show="*")
         self.confirm_password_entry.pack(pady=5)
+        self.confirm_password_entry.bind("<Return>", lambda event: self.create_account())
 
         create_button = tk.Button(self.root, text="Create Account", command=self.create_account)
         create_button.pack(pady=10)

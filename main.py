@@ -20,6 +20,7 @@ class RevisionPlannerApp:
         self.root = root
         self.root.title("Revision Planner")
         self.root.geometry("500x400")
+        self.current_week_start = None
 
         self.show_welcome_screen()
 
@@ -831,9 +832,12 @@ class RevisionPlannerApp:
 
     #-----STATISTICS-----#
 
-    def calculate_statistics(self):
+    def calculate_statistics(self, start_date=None, end_date=None):
         sessions = self.pending_user.sessions
         tasks = self.pending_user.tasks
+
+        if start_date and end_date:
+            sessions = [s for s in sessions if start_date <= s.start_time.date() <= end_date]
 
         total_seconds = sum(getattr(s, "duration_seconds", s.duration * 60) for s in sessions)
 
@@ -868,6 +872,11 @@ class RevisionPlannerApp:
             "subject_completion": subject_completion
         }
 
+    def get_week_range(self, reference_date):
+        monday = reference_date - timedelta(days=reference_date.weekday())
+        sunday = monday + timedelta(days=6)
+        return monday, sunday
+
     def print_test_statistics(self):
         stats = self.calculate_statistics()
         print(f"Total time: {self.format_time(stats['total_seconds'])}")
@@ -883,11 +892,29 @@ class RevisionPlannerApp:
     def show_statistics_screen(self):
         self.clear_screen()
 
-        stats = self.calculate_statistics()
+        if self.current_week_start is None:
+            self.current_week_start, _ = self.get_week_range(datetime.now().date())
+
+        week_start = self.current_week_start
+        week_end = week_start + timedelta(days=6)
+
+        stats = self.calculate_statistics(start_date=week_start, end_date=week_end)
         tasks = self.pending_user.tasks
 
         label = tk.Label(self.root, text="Statistics", font=("Segoe UI", 16))
         label.pack(pady=10)
+
+        week_frame = tk.Frame(self.root)
+        week_frame.pack(pady=5)
+
+        prev_week_button = tk.Button(week_frame, text="← Previous week", command=self.go_to_previous_week)
+        prev_week_button.pack(side="left", padx=5)
+
+        week_label = tk.Label(week_frame, text=f"Week of {week_start.strftime('%d %b')} – {week_end.strftime('%d %b %Y')}")
+        week_label.pack(side="left", padx=10)
+
+        next_week_button = tk.Button(week_frame, text="Next week →", command=self.go_to_next_week)
+        next_week_button.pack(side="left", padx=5)
 
         summary_frame = tk.Frame(self.root)
         summary_frame.pack(pady=5)
@@ -963,6 +990,14 @@ class RevisionPlannerApp:
 
         back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
         back_button.pack(pady=10)
+
+    def go_to_previous_week(self):
+        self.current_week_start -= timedelta(days=7)
+        self.show_statistics_screen()
+
+    def go_to_next_week(self):
+        self.current_week_start += timedelta(days=7)
+        self.show_statistics_screen()
 
     def show_progress_report_screen(self):
         self.clear_screen()

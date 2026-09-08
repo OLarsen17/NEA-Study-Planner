@@ -74,3 +74,19 @@ Plan:
 
 This is a genuinely bigger piece of work than previous Statistics additions, since it affects how sessions are filtered before any existing calculation runs, and needs new navigation UI on two screens. To be tackled as its own deliberate, focused piece of work rather than added incrementally on top of the current all-time version.
 
+
+## Statistics week navigation — issues found during testing
+
+Testing week navigation on the Statistics dashboard revealed several issues:
+
+1. Task completion count, average confidence, and the pie chart are not filtered by the selected week, only total_seconds and subject_totals (session-based) are. This means navigating to a past week with no activity still shows the same completion/confidence figures as the current week, which is misleading. Needs fixing so subject_completion, completed_count, and average_confidence are calculated from week-filtered tasks/sessions, not all-time.
+
+2. The bar chart breaks visually (inverted/negative axis, overlapping "0m 0s" labels) when a selected week has zero recorded study time, since max_height becomes 0 and set_ylim(top=0) produces a nonsensical range. Needs a dedicated "No study data this week" message instead of attempting to draw an empty chart, matching the existing pattern used when a user has no tasks at all.
+
+3. No upper bound on "Next week" navigation, allowing navigation into future weeks that cannot possibly contain data.
+
+4. No lower bound on "Previous week" navigation, allowing navigation before the user's account was even created. Requires storing an account creation date on User, which doesn't currently exist.
+
+5. No way to quickly return to the current week after navigating away, requires manually clicking "Previous/Next week" repeatedly.
+
+Navigation buttons themselves (moving between weeks, updating the displayed date range) work correctly. These are calculation and boundary issues layered on top of otherwise working navigation.

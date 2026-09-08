@@ -62,6 +62,18 @@
                 "completed": true,
                 "reminder_sent": false,
                 "elapsed_seconds": 0
+            },
+            {
+                "id": "c3ec28b5-0383-43ce-a5bf-c4bb742f5a31",
+                "title": "Biology hw",
+                "subject": "Biology",
+                "deadline": "06/10/2026",
+                "duration": 10,
+                "confidence_rating": 3,
+                "initial_confidence_rating": 3,
+                "completed": true,
+                "reminder_sent": false,
+                "elapsed_seconds": 0
             }
         ],
         "sessions": [
@@ -100,6 +112,15 @@
                 "duration": 0,
                 "duration_seconds": 2,
                 "task_subject": "Maths"
+            },
+            {
+                "id": "70e48929-a2b1-4dd1-88df-5fc82226ae6e",
+                "task_id": "c3ec28b5-0383-43ce-a5bf-c4bb742f5a31",
+                "start_time": "2026-09-08T10:41:17.141910",
+                "end_time": "2026-09-08T10:41:18.141910",
+                "duration": 0,
+                "duration_seconds": 1,
+                "task_subject": "Biology"
             }
         ],
         "settings": {

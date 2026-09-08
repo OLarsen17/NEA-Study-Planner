@@ -61,3 +61,16 @@ Reasoning: keeping the dashboard limited to two charts avoids needing a scroller
 
 Plan: fix all three of the above together as one combined pass, then take a fresh, accurate set of screenshots of the completed dashboard.
 
+## Statistics and Progress report need time-period filtering
+
+While building the Progress report screen, realised the current implementation (and the Statistics dashboard) shows all-time totals only, not filtered by time period. This doesn't match the original design: the Progress report mockup specifically showed "Week of 12 – 18 Feb 2027" in its header, and the 6.1 Calculate study time algorithm was originally designed to support daily, weekly and overall periods as a parameter, none of which is currently implemented.
+
+Plan:
+- Add a date-range filter to calculate_statistics(), so it can be called with a specific week (or no filter, for all-time) rather than always summing every session ever recorded.
+- Weeks defined as calendar weeks, Monday to Sunday, not rolling 7-day windows.
+- Add previous/next week navigation to both the Statistics dashboard and Progress report screens, so the user can look back at any previously studied week.
+- Add a monthly view as a dropdown option alongside weekly, letting the user switch between weekly and monthly totals.
+- Apply consistently across both screens, so the same selected time period is reflected in both the charts and the written feedback.
+
+This is a genuinely bigger piece of work than previous Statistics additions, since it affects how sessions are filtered before any existing calculation runs, and needs new navigation UI on two screens. To be tackled as its own deliberate, focused piece of work rather than added incrementally on top of the current all-time version.
+

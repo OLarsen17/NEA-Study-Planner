@@ -845,6 +845,15 @@ class RevisionPlannerApp:
         completed_count = len([t for t in tasks if t.completed])
         total_count = len(tasks)
 
+        subject_completion = {}
+        for task in tasks:
+            subject = task.subject
+            if subject not in subject_completion:
+                subject_completion[subject] = {"completed": 0, "total": 0}
+            subject_completion[subject]["total"] += 1
+            if task.completed:
+                subject_completion[subject]["completed"] += 1
+
         if total_count > 0:
             average_confidence = round(sum(t.confidence_rating for t in tasks) / total_count, 1)
         else:
@@ -855,7 +864,8 @@ class RevisionPlannerApp:
             "subject_totals": subject_totals,
             "completed_count": completed_count,
             "total_count": total_count,
-            "average_confidence": average_confidence
+            "average_confidence": average_confidence,
+            "subject_completion": subject_completion
         }
 
     def print_test_statistics(self):
@@ -948,8 +958,51 @@ class RevisionPlannerApp:
             no_pie_data_label = tk.Label(pie_frame, text="No tasks yet")
             no_pie_data_label.pack()
 
+        progress_report_button = tk.Button(self.root, text="View progress report →", command=self.show_progress_report_screen)
+        progress_report_button.pack(pady=5)
+
         back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
         back_button.pack(pady=10)
+
+    def show_progress_report_screen(self):
+        self.clear_screen()
+
+        stats = self.calculate_statistics()
+
+        label = tk.Label(self.root, text="Progress Report", font=("Segoe UI", 16))
+        label.pack(pady=10)
+
+        summary_text = f"You completed {stats['completed_count']} of {stats['total_count']} tasks and studied for {self.format_time_readable(stats['total_seconds'])}."
+        summary_label = tk.Label(self.root, text=summary_text, wraplength=400)
+        summary_label.pack(pady=5)
+
+        feedback_label = tk.Label(self.root, text="Subject Feedback", font=("Segoe UI", 12))
+        feedback_label.pack(pady=(15, 5))
+
+        feedback_frame = tk.Frame(self.root)
+        feedback_frame.pack(pady=5)
+
+        for subject, completion in stats['subject_completion'].items():
+            completed = completion["completed"]
+            total = completion["total"]
+
+            if total == 0:
+                continue
+
+            completion_ratio = completed / total
+
+            if completion_ratio < 0.5:
+                feedback_text = f"{subject}: You are falling behind in {subject}. Consider prioritising this subject next week."
+            elif completion_ratio == 1:
+                feedback_text = f"{subject}: You are making excellent progress in {subject}."
+            else:
+                feedback_text = f"{subject}: You are making good progress in {subject}."
+
+            subject_row = tk.Label(feedback_frame, text=feedback_text, wraplength=400, justify="left", anchor="w")
+            subject_row.pack(fill="x", pady=2)
+
+        back_button = tk.Button(self.root, text="Back to Statistics", command=self.show_statistics_screen)
+        back_button.pack(pady=10) 
 
 if __name__ == "__main__":
     root = tk.Tk()

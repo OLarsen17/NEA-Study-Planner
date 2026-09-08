@@ -926,6 +926,9 @@ class RevisionPlannerApp:
         next_week_button = tk.Button(week_frame, text="Next week →", command=self.go_to_next_week)
         next_week_button.pack(side="left", padx=5)
 
+        today_button = tk.Button(week_frame, text="Today", command=self.go_to_current_week)
+        today_button.pack(side="left", padx=5)
+
         summary_frame = tk.Frame(self.root)
         summary_frame.pack(pady=5)
 
@@ -1001,12 +1004,30 @@ class RevisionPlannerApp:
         back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
         back_button.pack(pady=10)
 
+    def go_to_current_week(self):
+        self.current_week_start, _ = self.get_week_range(datetime.now().date())
+        self.show_statistics_screen()
+
     def go_to_previous_week(self):
-        self.current_week_start -= timedelta(days=7)
+        account_week_start, _ = self.get_week_range(self.pending_user.created_date)
+        new_week_start = self.current_week_start - timedelta(days=7)
+
+        if new_week_start < account_week_start:
+            messagebox.showinfo("No Earlier Data", "You can't go back further than the week your account was created.")
+            return
+
+        self.current_week_start = new_week_start
         self.show_statistics_screen()
 
     def go_to_next_week(self):
-        self.current_week_start += timedelta(days=7)
+        current_week_start, _ = self.get_week_range(datetime.now().date())
+        new_week_start = self.current_week_start + timedelta(days=7)
+
+        if new_week_start > current_week_start:
+            messagebox.showinfo("No Future Data", "You can't view weeks that haven't happened yet.")
+            return
+
+        self.current_week_start = new_week_start
         self.show_statistics_screen()
 
     def show_progress_report_screen(self):

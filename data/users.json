@@ -40,7 +40,7 @@
                 "completed": true,
                 "reminder_sent": false,
                 "elapsed_seconds": 0,
-                "completed_date": "2026-09-08"
+                "completed_date": null
             },
             {
                 "id": "74a9fdd3-9fb9-411f-bdef-fd5713c4ba83",
@@ -144,7 +144,8 @@
             "high_contrast": false,
             "reminders_enabled": true,
             "reminder_days": 3
-        }
+        },
+        "created_date": "2026-09-08"
     },
     {
         "username": "newuser",
@@ -157,7 +158,8 @@
             "high_contrast": false,
             "reminders_enabled": true,
             "reminder_days": 3
-        }
+        },
+        "created_date": "2026-09-08"
     },
     {
         "username": "annabama",
@@ -170,7 +172,8 @@
             "high_contrast": false,
             "reminders_enabled": true,
             "reminder_days": 3
-        }
+        },
+        "created_date": "2026-09-08"
     },
     {
         "username": "test",
@@ -207,6 +210,7 @@
             "high_contrast": false,
             "reminders_enabled": true,
             "reminder_days": 3
-        }
+        },
+        "created_date": "2026-09-08"
     }
 ]

@@ -17,6 +17,7 @@ class Task:
         self.initial_confidence_rating = confidence_rating
         self.completed_date = None
         
+        
     def mark_complete(self):
         self.completed = True
 
@@ -33,6 +34,7 @@ class Task:
             "reminder_sent": self.reminder_sent,
             "elapsed_seconds": self.elapsed_seconds,
             "completed_date": str(self.completed_date) if self.completed_date else None,
+            
         }
 
     @staticmethod #means this method belongs to the class itself, not to any particular object
@@ -80,6 +82,7 @@ class User:
         self.tasks = []
         self.sessions = [] #somewhere to store sessions
         self.settings = Settings()
+        self.created_date = datetime.now().date()
 
     def add_task(self, task):
         self.tasks.append(task)
@@ -93,7 +96,8 @@ class User:
             "password": self.password,
             "tasks": [task.to_dict() for task in self.tasks],
             "sessions": [session.to_dict() for session in self.sessions], #update to include sessions
-            "settings": self.settings.to_dict()
+            "settings": self.settings.to_dict(),
+            "created_date": str(self.created_date)
         }
 
     @staticmethod
@@ -102,6 +106,8 @@ class User:
         user.tasks = [Task.from_dict(t) for t in data["tasks"]]
         user.sessions = [StudySession.from_dict(s) for s in data["sessions"]]
         user.settings = Settings.from_dict(data["settings"])
+        created_date_str = data.get("created_date")
+        user.created_date = datetime.fromisoformat(created_date_str).date() if created_date_str else datetime.now().date()
         return user
 
 class StudySession:

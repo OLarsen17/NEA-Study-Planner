@@ -13,7 +13,8 @@
                 "initial_confidence_rating": 3,
                 "completed": true,
                 "reminder_sent": true,
-                "elapsed_seconds": 0
+                "elapsed_seconds": 0,
+                "completed_date": null
             },
             {
                 "id": "24701cfe-ec62-479a-bda3-86ebba6c2fce",
@@ -25,7 +26,8 @@
                 "initial_confidence_rating": 3,
                 "completed": true,
                 "reminder_sent": false,
-                "elapsed_seconds": 0
+                "elapsed_seconds": 0,
+                "completed_date": null
             },
             {
                 "id": "170f8866-160a-467d-9e92-6a0d36cccb86",
@@ -35,9 +37,10 @@
                 "duration": 25,
                 "confidence_rating": 3,
                 "initial_confidence_rating": 4,
-                "completed": false,
+                "completed": true,
                 "reminder_sent": false,
-                "elapsed_seconds": 0
+                "elapsed_seconds": 0,
+                "completed_date": "2026-09-08"
             },
             {
                 "id": "74a9fdd3-9fb9-411f-bdef-fd5713c4ba83",
@@ -49,7 +52,8 @@
                 "initial_confidence_rating": 3,
                 "completed": false,
                 "reminder_sent": false,
-                "elapsed_seconds": 0
+                "elapsed_seconds": 0,
+                "completed_date": null
             },
             {
                 "id": "cf4150eb-8d9e-4bf3-a0ea-21f0e727fe62",
@@ -61,7 +65,8 @@
                 "initial_confidence_rating": 4,
                 "completed": true,
                 "reminder_sent": false,
-                "elapsed_seconds": 0
+                "elapsed_seconds": 0,
+                "completed_date": null
             },
             {
                 "id": "c3ec28b5-0383-43ce-a5bf-c4bb742f5a31",
@@ -71,9 +76,10 @@
                 "duration": 10,
                 "confidence_rating": 3,
                 "initial_confidence_rating": 3,
-                "completed": true,
+                "completed": false,
                 "reminder_sent": false,
-                "elapsed_seconds": 0
+                "elapsed_seconds": 0,
+                "completed_date": null
             }
         ],
         "sessions": [
@@ -118,6 +124,15 @@
                 "task_id": "c3ec28b5-0383-43ce-a5bf-c4bb742f5a31",
                 "start_time": "2026-09-08T10:41:17.141910",
                 "end_time": "2026-09-08T10:41:18.141910",
+                "duration": 0,
+                "duration_seconds": 1,
+                "task_subject": "Biology"
+            },
+            {
+                "id": "0c95a366-de4e-43c7-81c5-269c9405c530",
+                "task_id": "170f8866-160a-467d-9e92-6a0d36cccb86",
+                "start_time": "2026-09-08T19:42:49.710958",
+                "end_time": "2026-09-08T19:42:50.710958",
                 "duration": 0,
                 "duration_seconds": 1,
                 "task_subject": "Biology"
@@ -171,7 +186,8 @@
                 "initial_confidence_rating": 3,
                 "completed": true,
                 "reminder_sent": true,
-                "elapsed_seconds": 0
+                "elapsed_seconds": 0,
+                "completed_date": null
             }
         ],
         "sessions": [

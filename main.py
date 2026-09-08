@@ -433,6 +433,10 @@ class RevisionPlannerApp:
 
     def toggle_task_complete(self, task, completed_var):
         task.completed = completed_var.get()
+        if task.completed:
+            task.completed_date = datetime.now().date()
+        else:
+            task.completed_date = None
         self.save_current_user()
         self.refresh_task_list()
 
@@ -715,6 +719,7 @@ class RevisionPlannerApp:
 
         if mark_complete:
             self.timer_task.completed = True
+            self.timer_task.completed_date = datetime.now().date()
         else:
             self.timer_task.elapsed_seconds = self.last_session_total_seconds
 
@@ -839,6 +844,11 @@ class RevisionPlannerApp:
         if start_date and end_date:
             sessions = [s for s in sessions if start_date <= s.start_time.date() <= end_date]
 
+        if start_date and end_date:
+            week_tasks = [t for t in tasks if t.completed_date and start_date <= t.completed_date <= end_date]
+        else:
+            week_tasks = [t for t in tasks if t.completed]
+
         total_seconds = sum(getattr(s, "duration_seconds", s.duration * 60) for s in sessions)
 
         subject_totals = {}
@@ -846,11 +856,11 @@ class RevisionPlannerApp:
             session_seconds = getattr(session, "duration_seconds", session.duration * 60)
             subject = getattr(session, "task_subject", "Unknown")
             subject_totals[subject] = subject_totals.get(subject, 0) + session_seconds
-        completed_count = len([t for t in tasks if t.completed])
+        completed_count = len(week_tasks)
         total_count = len(tasks)
 
         subject_completion = {}
-        for task in tasks:
+        for task in week_tasks:
             subject = task.subject
             if subject not in subject_completion:
                 subject_completion[subject] = {"completed": 0, "total": 0}
@@ -858,8 +868,8 @@ class RevisionPlannerApp:
             if task.completed:
                 subject_completion[subject]["completed"] += 1
 
-        if total_count > 0:
-            average_confidence = round(sum(t.confidence_rating for t in tasks) / total_count, 1)
+        if len(week_tasks) > 0:
+            average_confidence = round(sum(t.confidence_rating for t in week_tasks) / len(week_tasks), 1)        
         else:
             average_confidence = 0
 

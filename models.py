@@ -15,6 +15,7 @@ class Task:
         self.reminder_sent = False #defaulted to False becasue it hasnt happened yet
         self.elapsed_seconds = 0
         self.initial_confidence_rating = confidence_rating
+        self.completed_date = None
         
     def mark_complete(self):
         self.completed = True
@@ -30,7 +31,8 @@ class Task:
             "initial_confidence_rating": self.initial_confidence_rating,
             "completed": self.completed,
             "reminder_sent": self.reminder_sent,
-            "elapsed_seconds": self.elapsed_seconds
+            "elapsed_seconds": self.elapsed_seconds,
+            "completed_date": str(self.completed_date) if self.completed_date else None,
         }
 
     @staticmethod #means this method belongs to the class itself, not to any particular object

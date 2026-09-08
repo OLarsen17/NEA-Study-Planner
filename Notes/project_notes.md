@@ -90,3 +90,31 @@ Testing week navigation on the Statistics dashboard revealed several issues:
 5. No way to quickly return to the current week after navigating away, requires manually clicking "Previous/Next week" repeatedly.
 
 Navigation buttons themselves (moving between weeks, updating the displayed date range) work correctly. These are calculation and boundary issues layered on top of otherwise working navigation.
+
+
+## Statistics: redefining "tasks completed" and confidence to avoid unbounded denominators
+
+Identified a flaw in the initial week-filtering approach: using total_count (all tasks ever created) as the denominator for "Tasks completed" means the number only ever grows over months of use, quickly becoming meaningless (e.g. "2 / 340").
+
+New definition, agreed after discussion: a task counts toward a given week's denominator unless it was completed strictly before that week started. This is equivalent to: denominator = total tasks − tasks completed before this week's start (i.e. tasks with completed_date is None, or completed_date falls within or after this week).
+
+This produces the intended behaviour without needing to track anything extra beyond the existing completed_date field:
+- At the start of a week, the denominator naturally equals the current backlog of incomplete tasks.
+- Tasks added during the week increase the denominator (they were never completed before this week).
+- Tasks completed during the week move into the numerator but remain in the denominator, since their completion happened within this week, not before it.
+- At the start of the next week, tasks completed the week before now have a completed_date before the new week's start, so they correctly drop out of the new denominator, which resets to reflect the current backlog again.
+- If a user unticks a completed task, completed_date resets to None, so it correctly re-enters the denominator.
+
+Numerator = tasks with completed_date falling within the selected week (already implemented).
+
+Monthly statistics should follow the identical concept, substituting the week boundary for a calendar month boundary: total time studied, the bar/pie charts, tasks completed, and the denominator logic all apply the same way, just scoped to a month instead of a week, likely as a dropdown or toggle between weekly/monthly views.
+
+Average confidence rating should only be calculated from tasks that have been completed (within the selected period), since the confidence rating of an unfinished task carries no real analytical weight on its own, it only becomes meaningful in a future before/after comparison feature (see earlier NOTES.md entry on confidence-improvement statistics), not as part of a general average.
+
+## Planned order of work
+
+1. Document this design (this entry) — done.
+2. Fix existing week navigation issues already logged: bar/pie chart breaking on a week with zero data, missing upper bound (no future weeks) and lower bound (no weeks before account creation) on navigation, and a "back to current week" shortcut.
+3. Implement the new completed-tasks/denominator logic and confidence-only-on-completed-tasks logic described above.
+4. Extend to a monthly view using the same underlying logic.
+5. Once all of the above is implemented and stable, clear users.json and rebuild test data fresh, since current test data predates several of these changes (e.g. several completed tasks have no completed_date at all, from before that field existed) and would otherwise produce misleading results under the new logic.

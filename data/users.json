@@ -135,5 +135,41 @@
             "reminders_enabled": true,
             "reminder_days": 3
         }
+    },
+    {
+        "username": "test",
+        "password": "testaccount",
+        "tasks": [
+            {
+                "id": "ac05ba74-8000-4b5f-9f94-9cec94e4a621",
+                "title": "test",
+                "subject": "Test",
+                "deadline": "09/09/2026",
+                "duration": 10,
+                "confidence_rating": 3,
+                "initial_confidence_rating": 3,
+                "completed": true,
+                "reminder_sent": true,
+                "elapsed_seconds": 0
+            }
+        ],
+        "sessions": [
+            {
+                "id": "52ffad36-055b-4028-9a8a-0613ef3eb674",
+                "task_id": "ac05ba74-8000-4b5f-9f94-9cec94e4a621",
+                "start_time": "2026-09-08T10:25:03.648966",
+                "end_time": "2026-09-08T10:25:13.648966",
+                "duration": 0,
+                "duration_seconds": 10,
+                "task_subject": "Test"
+            }
+        ],
+        "settings": {
+            "theme": "light",
+            "font_size": "medium",
+            "high_contrast": false,
+            "reminders_enabled": true,
+            "reminder_days": 3
+        }
     }
 ]

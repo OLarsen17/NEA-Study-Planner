@@ -865,6 +865,11 @@ class RevisionPlannerApp:
             print(f"{subject}: {self.format_time(seconds)}")
         print(f"Completed: {stats['completed_count']} / {stats['total_count']}")
 
+    def format_time_readable(self, total_seconds):
+        minutes = total_seconds // 60
+        seconds = total_seconds % 60
+        return f"{minutes}m {seconds}s"
+
     def show_statistics_screen(self):
         self.clear_screen()
 
@@ -901,9 +906,19 @@ class RevisionPlannerApp:
         if subjects:
             bar_figure = Figure(figsize=(3.5, 3), dpi=80)
             bar_ax = bar_figure.add_subplot()
-            bar_ax.bar(subjects, minutes)
+            bars = bar_ax.bar(subjects, minutes)
             bar_ax.set_title("Time per subject (mins)")
             bar_ax.tick_params(axis='x', labelrotation=30)
+
+            max_height = max(minutes) if minutes else 0
+            label_offset = max_height * 0.05
+
+            for bar, subject in zip(bars, subjects):
+                seconds = stats['subject_totals'].get(subject, 0)
+                label = self.format_time_readable(seconds)
+                bar_ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + label_offset, label, ha='center', va='bottom', fontsize=8)
+
+            bar_ax.set_ylim(top=max_height * 1.2)
             bar_figure.tight_layout()
 
             bar_canvas = FigureCanvasTkAgg(bar_figure, master=bar_frame)

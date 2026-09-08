@@ -264,7 +264,8 @@ class RevisionPlannerApp:
 
         confidence_label = tk.Label(self.root, text="Confidence Rating (1-5)")
         confidence_label.pack()
-        self.task_confidence_entry = tk.Entry(self.root)
+        self.task_confidence_entry = ttk.Spinbox(self.root, from_=1, to=5, width=5, state="readonly")
+        self.task_confidence_entry.set(3)
         self.task_confidence_entry.pack(pady=5)
 
         save_button = tk.Button(self.root, text="Save Task", command=self.save_task)
@@ -446,8 +447,8 @@ class RevisionPlannerApp:
 
         confidence_label = tk.Label(self.root, text="Confidence Rating (1-5)")
         confidence_label.pack()
-        self.edit_confidence_entry = tk.Entry(self.root)
-        self.edit_confidence_entry.insert(0, str(task.confidence_rating))
+        self.edit_confidence_entry = ttk.Spinbox(self.root, from_=1, to=5, width=5, state="readonly")
+        self.edit_confidence_entry.set(task.confidence_rating)
         self.edit_confidence_entry.pack(pady=5)
 
         save_button = tk.Button(self.root, text="Save Changes", command=self.save_edited_task)
@@ -682,7 +683,7 @@ class RevisionPlannerApp:
         confidence_label.pack(pady=(15, 0))
 
         self.confidence_var = tk.StringVar(value=str(self.timer_task.confidence_rating))
-        confidence_spinbox = ttk.Spinbox(self.root, from_=1, to=5, textvariable=self.confidence_var, width=5)
+        confidence_spinbox = ttk.Spinbox(self.root, from_=1, to=5, textvariable=self.confidence_var, width=5, state="readonly")
         confidence_spinbox.pack(pady=5)
 
     def finish_session(self, mark_complete):

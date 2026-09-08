@@ -97,8 +97,18 @@ class RevisionPlannerApp:
         self.password_entry.pack(pady=5)
         self.password_entry.bind("<Return>", lambda event: self.check_password())
 
+        self.show_password_var = tk.BooleanVar(value=False)
+        show_password_check = tk.Checkbutton(self.root, text="Show password", variable=self.show_password_var, command=self.toggle_password_visibility)
+        show_password_check.pack()
+
         continue_button = tk.Button(self.root, text="Continue", command=self.check_password)
         continue_button.pack(pady=10)
+
+    def toggle_password_visibility(self):
+        if self.show_password_var.get():
+            self.password_entry.config(show="")
+        else:
+            self.password_entry.config(show="*")
 
     def check_password(self):
         entered_password = self.password_entry.get()
@@ -130,11 +140,23 @@ class RevisionPlannerApp:
         self.confirm_password_entry.pack(pady=5)
         self.confirm_password_entry.bind("<Return>", lambda event: self.create_account())
 
+        self.show_create_password_var = tk.BooleanVar(value=False)
+        show_create_password_check = tk.Checkbutton(self.root, text="Show password", variable=self.show_create_password_var, command=self.toggle_create_password_visibility)
+        show_create_password_check.pack()
+
         create_button = tk.Button(self.root, text="Create Account", command=self.create_account)
         create_button.pack(pady=10)
 
         login_link = tk.Button(self.root, text="Already have an account? Log in", command=self.show_login_screen)
         login_link.pack(pady=5)
+
+    def toggle_create_password_visibility(self):
+        if self.show_create_password_var.get():
+            self.new_password_entry.config(show="")
+            self.confirm_password_entry.config(show="")
+        else:
+            self.new_password_entry.config(show="*")
+            self.confirm_password_entry.config(show="*")
 
     def create_account(self):
         username = self.new_username_entry.get()

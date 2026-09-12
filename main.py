@@ -1038,7 +1038,10 @@ class RevisionPlannerApp:
     def show_progress_report_screen(self):
         self.clear_screen()
 
-        stats = self.calculate_statistics()
+        week_start = self.current_week_start
+        week_end = week_start + timedelta(days=6)
+
+        stats = self.calculate_statistics(start_date=week_start, end_date=week_end)
 
         label = tk.Label(self.root, text="Progress Report", font=("Segoe UI", 16))
         label.pack(pady=10)
@@ -1060,14 +1063,17 @@ class RevisionPlannerApp:
             if total == 0:
                 continue
 
-            completion_ratio = completed / total
+            time_spent = stats['subject_totals'].get(subject, 0)
+            has_time_spent = time_spent > 0
 
-            if completion_ratio < 0.5:
-                feedback_text = f"{subject}: You are falling behind in {subject}. Consider prioritising this subject next week."
-            elif completion_ratio == 1:
-                feedback_text = f"{subject}: You are making excellent progress in {subject}."
+            if completed == total:
+                feedback_text = f"{subject}: You're doing great, fully up to date!"
+            elif completed > 0 and has_time_spent:
+                feedback_text = f"{subject}: You're making progress, keep it up."
+            elif completed == 0 and has_time_spent:
+                feedback_text = f"{subject}: You've been working on this but haven't finished a task yet."
             else:
-                feedback_text = f"{subject}: You are making good progress in {subject}."
+                feedback_text = f"{subject}: You haven't studied this yet this week, consider giving it some attention."
 
             subject_row = tk.Label(feedback_frame, text=feedback_text, wraplength=400, justify="left", anchor="w")
             subject_row.pack(fill="x", pady=2)

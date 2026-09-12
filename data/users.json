@@ -4,190 +4,53 @@
         "password": "testpassword123",
         "tasks": [
             {
-                "id": "98207335-96fe-443d-a35f-f85944e60762",
-                "title": "Maths Transtion Work",
+                "id": "b8284d0e-7d8d-4808-a73e-da6310c4c163",
+                "title": "Qu7-14 Ch7 maths",
                 "subject": "Maths",
-                "deadline": "10/09/2026",
-                "duration": 200,
-                "confidence_rating": 4,
-                "initial_confidence_rating": 3,
-                "completed": true,
-                "reminder_sent": true,
-                "elapsed_seconds": 0,
-                "completed_date": null
-            },
-            {
-                "id": "24701cfe-ec62-479a-bda3-86ebba6c2fce",
-                "title": "Chem Question Pack",
-                "subject": "Chemistry",
-                "deadline": "12/09/2026",
-                "duration": 50,
+                "deadline": "17/09/2026",
+                "duration": 45,
                 "confidence_rating": 3,
                 "initial_confidence_rating": 3,
-                "completed": true,
+                "completed": false,
                 "reminder_sent": false,
                 "elapsed_seconds": 0,
                 "completed_date": null
             },
             {
-                "id": "170f8866-160a-467d-9e92-6a0d36cccb86",
-                "title": "Biology questions",
-                "subject": "Biology",
-                "deadline": "06/10/2026",
-                "duration": 25,
-                "confidence_rating": 3,
-                "initial_confidence_rating": 4,
-                "completed": true,
-                "reminder_sent": false,
-                "elapsed_seconds": 0,
-                "completed_date": null
-            },
-            {
-                "id": "74a9fdd3-9fb9-411f-bdef-fd5713c4ba83",
-                "title": "CS NEA",
+                "id": "9b52217f-66f7-4d86-8f8c-6a85e0039fc5",
+                "title": "Code Nea",
                 "subject": "Computer Science",
                 "deadline": "17/10/2026",
                 "duration": 6000,
-                "confidence_rating": 3,
-                "initial_confidence_rating": 3,
+                "confidence_rating": 2,
+                "initial_confidence_rating": 2,
                 "completed": false,
                 "reminder_sent": false,
                 "elapsed_seconds": 0,
                 "completed_date": null
             },
             {
-                "id": "cf4150eb-8d9e-4bf3-a0ea-21f0e727fe62",
-                "title": "Maths Mech HW",
-                "subject": "Maths",
-                "deadline": "12/09/2026",
-                "duration": 30,
+                "id": "accd36d3-9019-4936-9103-b2375e4c41c0",
+                "title": "Task 2 unit guide chem",
+                "subject": "Chemistry",
+                "deadline": "14/09/2026",
+                "duration": 20,
                 "confidence_rating": 5,
                 "initial_confidence_rating": 4,
-                "completed": true,
-                "reminder_sent": false,
-                "elapsed_seconds": 0,
-                "completed_date": null
-            },
-            {
-                "id": "c3ec28b5-0383-43ce-a5bf-c4bb742f5a31",
-                "title": "Biology hw",
-                "subject": "Biology",
-                "deadline": "06/10/2026",
-                "duration": 10,
-                "confidence_rating": 3,
-                "initial_confidence_rating": 3,
                 "completed": false,
-                "reminder_sent": false,
+                "reminder_sent": true,
                 "elapsed_seconds": 0,
                 "completed_date": null
-            }
-        ],
-        "sessions": [
-            {
-                "id": "f543b4f9-924c-4af4-a790-c7210dfaa20a",
-                "task_id": "98207335-96fe-443d-a35f-f85944e60762",
-                "start_time": "2026-09-07T10:09:24.178752",
-                "end_time": "2026-09-07T10:09:49.178752",
-                "duration": 0,
-                "duration_seconds": 25,
-                "task_subject": "Maths"
             },
             {
-                "id": "a2e90a95-b005-48be-ba7b-9456d5bf5630",
-                "task_id": "24701cfe-ec62-479a-bda3-86ebba6c2fce",
-                "start_time": "2026-09-07T10:10:05.011803",
-                "end_time": "2026-09-07T10:10:35.011803",
-                "duration": 0,
-                "duration_seconds": 30,
-                "task_subject": "Chemistry"
-            },
-            {
-                "id": "461e8a02-7b2f-4476-b9aa-1e20c724af49",
-                "task_id": "796d3b29-337f-4c66-bff2-28144d7bfcbf",
-                "start_time": "2026-09-07T10:11:08.116901",
-                "end_time": "2026-09-07T10:11:18.116901",
-                "duration": 0,
-                "duration_seconds": 10,
-                "task_subject": "Computer Science"
-            },
-            {
-                "id": "101fab7a-8951-4d8c-92c8-2b406b0bd4c9",
-                "task_id": "cf4150eb-8d9e-4bf3-a0ea-21f0e727fe62",
-                "start_time": "2026-09-08T10:11:24.102519",
-                "end_time": "2026-09-08T10:11:26.102519",
-                "duration": 0,
-                "duration_seconds": 2,
-                "task_subject": "Maths"
-            },
-            {
-                "id": "70e48929-a2b1-4dd1-88df-5fc82226ae6e",
-                "task_id": "c3ec28b5-0383-43ce-a5bf-c4bb742f5a31",
-                "start_time": "2026-09-08T10:41:17.141910",
-                "end_time": "2026-09-08T10:41:18.141910",
-                "duration": 0,
-                "duration_seconds": 1,
-                "task_subject": "Biology"
-            },
-            {
-                "id": "0c95a366-de4e-43c7-81c5-269c9405c530",
-                "task_id": "170f8866-160a-467d-9e92-6a0d36cccb86",
-                "start_time": "2026-09-08T19:42:49.710958",
-                "end_time": "2026-09-08T19:42:50.710958",
-                "duration": 0,
-                "duration_seconds": 1,
-                "task_subject": "Biology"
-            }
-        ],
-        "settings": {
-            "theme": "light",
-            "font_size": "medium",
-            "high_contrast": false,
-            "reminders_enabled": true,
-            "reminder_days": 3
-        },
-        "created_date": "2026-09-08"
-    },
-    {
-        "username": "newuser",
-        "password": "testpassword321",
-        "tasks": [],
-        "sessions": [],
-        "settings": {
-            "theme": "light",
-            "font_size": "medium",
-            "high_contrast": false,
-            "reminders_enabled": true,
-            "reminder_days": 3
-        },
-        "created_date": "2026-09-08"
-    },
-    {
-        "username": "annabama",
-        "password": "helloworld",
-        "tasks": [],
-        "sessions": [],
-        "settings": {
-            "theme": "light",
-            "font_size": "medium",
-            "high_contrast": false,
-            "reminders_enabled": true,
-            "reminder_days": 3
-        },
-        "created_date": "2026-09-08"
-    },
-    {
-        "username": "test",
-        "password": "testaccount",
-        "tasks": [
-            {
-                "id": "ac05ba74-8000-4b5f-9f94-9cec94e4a621",
-                "title": "test",
-                "subject": "Test",
-                "deadline": "09/09/2026",
-                "duration": 10,
-                "confidence_rating": 3,
-                "initial_confidence_rating": 3,
-                "completed": true,
+                "id": "a6ce8a97-8429-460e-bd8b-964f8120f1b5",
+                "title": "Bio pack",
+                "subject": "Biology",
+                "deadline": "13/09/2026",
+                "duration": 30,
+                "confidence_rating": 2,
+                "initial_confidence_rating": 2,
+                "completed": false,
                 "reminder_sent": true,
                 "elapsed_seconds": 0,
                 "completed_date": null
@@ -195,13 +58,13 @@
         ],
         "sessions": [
             {
-                "id": "52ffad36-055b-4028-9a8a-0613ef3eb674",
-                "task_id": "ac05ba74-8000-4b5f-9f94-9cec94e4a621",
-                "start_time": "2026-09-08T10:25:03.648966",
-                "end_time": "2026-09-08T10:25:13.648966",
-                "duration": 0,
-                "duration_seconds": 10,
-                "task_subject": "Test"
+                "id": "16345d95-2dba-44bd-a1b2-c6ca4c1113b3",
+                "task_id": "accd36d3-9019-4936-9103-b2375e4c41c0",
+                "start_time": "2026-09-12T21:06:19.685780",
+                "end_time": "2026-09-12T21:09:22.685780",
+                "duration": 3,
+                "duration_seconds": 183,
+                "task_subject": "Chemistry"
             }
         ],
         "settings": {
@@ -211,6 +74,6 @@
             "reminders_enabled": true,
             "reminder_days": 3
         },
-        "created_date": "2026-09-08"
+        "created_date": "2026-09-12"
     }
 ]

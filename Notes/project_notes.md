@@ -118,3 +118,8 @@ Average confidence rating should only be calculated from tasks that have been co
 3. Implement the new completed-tasks/denominator logic and confidence-only-on-completed-tasks logic described above.
 4. Extend to a monthly view using the same underlying logic.
 5. Once all of the above is implemented and stable, clear users.json and rebuild test data fresh, since current test data predates several of these changes (e.g. several completed tasks have no completed_date at all, from before that field existed) and would otherwise produce misleading results under the new logic.
+
+
+## Progress report feedback wording needs revisiting
+
+The current subject feedback on the Progress report ("You are falling behind in X...") can feel harsh and demotivating for a genuinely small gap, e.g. missing just one task out of a few shouldn't necessarily read as "falling behind." Wording and/or thresholds need softening, and should be reviewed against the new denominator/completion logic once it's fully bedded in, since the Progress report's subject_completion calculation may need the same treatment as the main Statistics screen.

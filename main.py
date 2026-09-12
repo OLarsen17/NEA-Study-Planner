@@ -952,8 +952,10 @@ class RevisionPlannerApp:
         for subject in subjects:
             seconds = stats['subject_totals'].get(subject, 0)
             minutes.append(round(seconds / 60, 1))
-            
-        if subjects:
+
+        has_time_data = any(seconds > 0 for seconds in stats['subject_totals'].values())
+
+        if subjects and has_time_data:
             bar_figure = Figure(figsize=(3.5, 3), dpi=80)
             bar_ax = bar_figure.add_subplot()
             bars = bar_ax.bar(subjects, minutes)
@@ -975,13 +977,15 @@ class RevisionPlannerApp:
             bar_canvas.draw()
             bar_canvas.get_tk_widget().pack()
         else:
-            no_bar_data_label = tk.Label(bar_frame, text="No study data yet")
+            no_bar_data_label = tk.Label(bar_frame, text="No study data for this week")
             no_bar_data_label.pack()
 
         pie_frame = tk.Frame(charts_frame)
         pie_frame.pack(side="left", padx=10)
 
-        if stats['total_count'] > 0:
+        has_completion_data = stats['completed_count'] > 0 or (stats['total_count'] - stats['completed_count']) > 0
+
+        if has_completion_data:
             pie_figure = Figure(figsize=(3.5, 3), dpi=80)
             pie_ax = pie_figure.add_subplot()
             pie_ax.pie(
@@ -995,7 +999,7 @@ class RevisionPlannerApp:
             pie_canvas.draw()
             pie_canvas.get_tk_widget().pack()
         else:
-            no_pie_data_label = tk.Label(pie_frame, text="No tasks yet")
+            no_pie_data_label = tk.Label(pie_frame, text="No task activity for this week")
             no_pie_data_label.pack()
 
         progress_report_button = tk.Button(self.root, text="View progress report →", command=self.show_progress_report_screen)

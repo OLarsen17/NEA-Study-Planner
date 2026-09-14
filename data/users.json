@@ -12,7 +12,7 @@
                 "confidence_rating": 3,
                 "initial_confidence_rating": 3,
                 "completed": false,
-                "reminder_sent": false,
+                "reminder_sent": true,
                 "elapsed_seconds": 0,
                 "completed_date": null
             },
@@ -40,7 +40,7 @@
                 "completed": true,
                 "reminder_sent": true,
                 "elapsed_seconds": 0,
-                "completed_date": "2026-09-12"
+                "completed_date": null
             },
             {
                 "id": "a6ce8a97-8429-460e-bd8b-964f8120f1b5",
@@ -66,7 +66,7 @@
                 "completed": true,
                 "reminder_sent": false,
                 "elapsed_seconds": 0,
-                "completed_date": "2026-09-12"
+                "completed_date": null
             }
         ],
         "sessions": [

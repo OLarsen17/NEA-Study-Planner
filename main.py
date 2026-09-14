@@ -21,6 +21,8 @@ class RevisionPlannerApp:
         self.root.title("Revision Planner")
         self.root.geometry("500x400")
         self.current_week_start = None
+        self.stats_view_mode = "weekly"
+        self.current_month_start = None
 
         self.show_welcome_screen()
 
@@ -905,31 +907,45 @@ class RevisionPlannerApp:
 
         if self.current_week_start is None:
             self.current_week_start, _ = self.get_week_range(datetime.now().date())
-
-        week_start = self.current_week_start
-        week_end = week_start + timedelta(days=6)
-
-        stats = self.calculate_statistics(start_date=week_start, end_date=week_end)
-        tasks = self.pending_user.tasks
+        if self.current_month_start is None:
+            self.current_month_start, _ = self.get_month_range(datetime.now().date())
 
         label = tk.Label(self.root, text="Statistics", font=("Segoe UI", 16))
         label.pack(pady=10)
 
-        week_frame = tk.Frame(self.root)
-        week_frame.pack(pady=5)
+        mode_frame = tk.Frame(self.root)
+        mode_frame.pack(pady=5)
 
-        prev_week_button = tk.Button(week_frame, text="← Previous week", command=self.go_to_previous_week)
-        prev_week_button.pack(side="left", padx=5)
+        self.stats_view_var = tk.StringVar(value=self.stats_view_mode)
+        view_menu = tk.OptionMenu(mode_frame, self.stats_view_var, "weekly", "monthly", command=lambda choice: self.change_stats_view(choice))
+        view_menu.pack()
 
-        week_label = tk.Label(week_frame, text=f"Week of {week_start.strftime('%d %b')} – {week_end.strftime('%d %b %Y')}")
-        week_label.pack(side="left", padx=10)
+        if self.stats_view_mode == "weekly":
+            period_start = self.current_week_start
+            period_end = period_start + timedelta(days=6)
+            period_label_text = f"Week of {period_start.strftime('%d %b')} – {period_end.strftime('%d %b %Y')}"
+        else:
+            period_start = self.current_month_start
+            _, period_end = self.get_month_range(period_start)
+            period_label_text = period_start.strftime('%B %Y')
 
-        next_week_button = tk.Button(week_frame, text="Next week →", command=self.go_to_next_week)
-        next_week_button.pack(side="left", padx=5)
+        stats = self.calculate_statistics(start_date=period_start, end_date=period_end)
+        tasks = self.pending_user.tasks
 
-        today_button = tk.Button(week_frame, text="Today", command=self.go_to_current_week)
+        nav_frame = tk.Frame(self.root)
+        nav_frame.pack(pady=5)
+
+        prev_button = tk.Button(nav_frame, text="← Previous", command=self.go_to_previous_period)
+        prev_button.pack(side="left", padx=5)
+
+        period_label = tk.Label(nav_frame, text=period_label_text)
+        period_label.pack(side="left", padx=10)
+
+        next_button = tk.Button(nav_frame, text="Next →", command=self.go_to_next_period)
+        next_button.pack(side="left", padx=5)
+
+        today_button = tk.Button(nav_frame, text="Today", command=self.go_to_current_period)
         today_button.pack(side="left", padx=5)
-
         summary_frame = tk.Frame(self.root)
         summary_frame.pack(pady=5)
 
@@ -1009,30 +1025,59 @@ class RevisionPlannerApp:
         back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
         back_button.pack(pady=10)
 
-    def go_to_current_week(self):
-        self.current_week_start, _ = self.get_week_range(datetime.now().date())
+    def change_stats_view(self, choice):
+        self.stats_view_mode = choice
         self.show_statistics_screen()
 
-    def go_to_previous_week(self):
-        account_week_start, _ = self.get_week_range(self.pending_user.created_date)
-        new_week_start = self.current_week_start - timedelta(days=7)
-
-        if new_week_start < account_week_start:
-            messagebox.showinfo("No Earlier Data", "You can't go back further than the week your account was created.")
-            return
-
-        self.current_week_start = new_week_start
+    def go_to_current_period(self):
+        if self.stats_view_mode == "weekly":
+            self.current_week_start, _ = self.get_week_range(datetime.now().date())
+        else:
+            self.current_month_start, _ = self.get_month_range(datetime.now().date())
         self.show_statistics_screen()
 
-    def go_to_next_week(self):
-        current_week_start, _ = self.get_week_range(datetime.now().date())
-        new_week_start = self.current_week_start + timedelta(days=7)
+    def go_to_previous_period(self):
+        if self.stats_view_mode == "weekly":
+            account_start, _ = self.get_week_range(self.pending_user.created_date)
+            new_start = self.current_week_start - timedelta(days=7)
+            if new_start < account_start:
+                messagebox.showinfo("No Earlier Data", "You can't go back further than the week your account was created.")
+                return
+            self.current_week_start = new_start
+        else:
+            account_start, _ = self.get_month_range(self.pending_user.created_date)
+            current_month_first_day = self.current_month_start
+            if current_month_first_day.month == 1:
+                new_start = current_month_first_day.replace(year=current_month_first_day.year - 1, month=12)
+            else:
+                new_start = current_month_first_day.replace(month=current_month_first_day.month - 1)
+            if new_start < account_start:
+                messagebox.showinfo("No Earlier Data", "You can't go back further than the month your account was created.")
+                return
+            self.current_month_start = new_start
 
-        if new_week_start > current_week_start:
-            messagebox.showinfo("No Future Data", "You can't view weeks that haven't happened yet.")
-            return
+        self.show_statistics_screen()
 
-        self.current_week_start = new_week_start
+    def go_to_next_period(self):
+        if self.stats_view_mode == "weekly":
+            current_start, _ = self.get_week_range(datetime.now().date())
+            new_start = self.current_week_start + timedelta(days=7)
+            if new_start > current_start:
+                messagebox.showinfo("No Future Data", "You can't view weeks that haven't happened yet.")
+                return
+            self.current_week_start = new_start
+        else:
+            current_start, _ = self.get_month_range(datetime.now().date())
+            current_month_first_day = self.current_month_start
+            if current_month_first_day.month == 12:
+                new_start = current_month_first_day.replace(year=current_month_first_day.year + 1, month=1)
+            else:
+                new_start = current_month_first_day.replace(month=current_month_first_day.month + 1)
+            if new_start > current_start:
+                messagebox.showinfo("No Future Data", "You can't view months that haven't happened yet.")
+                return
+            self.current_month_start = new_start
+
         self.show_statistics_screen()
 
     def show_progress_report_screen(self):
@@ -1080,6 +1125,15 @@ class RevisionPlannerApp:
 
         back_button = tk.Button(self.root, text="Back to Statistics", command=self.show_statistics_screen)
         back_button.pack(pady=10) 
+
+    def get_month_range(self, reference_date):
+        month_start = reference_date.replace(day=1)
+        if reference_date.month == 12:
+            next_month_start = reference_date.replace(year=reference_date.year + 1, month=1, day=1)
+        else:
+            next_month_start = reference_date.replace(month=reference_date.month + 1, day=1)
+        month_end = next_month_start - timedelta(days=1)
+        return month_start, month_end
 
 if __name__ == "__main__":
     root = tk.Tk()

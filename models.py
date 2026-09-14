@@ -37,7 +37,7 @@ class Task:
             
         }
 
-    @staticmethod #means this method belongs to the class itself, not to any particular object
+    @staticmethod
     def from_dict(data):
         task = Task(data["title"], data["subject"], data["deadline"], data["duration"], data["confidence_rating"])
         task.id = data["id"]
@@ -45,6 +45,8 @@ class Task:
         task.reminder_sent = data["reminder_sent"]
         task.elapsed_seconds = data.get("elapsed_seconds", 0)
         task.initial_confidence_rating = data.get("initial_confidence_rating", data["confidence_rating"])
+        completed_date_str = data.get("completed_date")
+        task.completed_date = datetime.fromisoformat(completed_date_str).date() if completed_date_str else None
         return task
 
 class Settings: #simple version to be reference from user

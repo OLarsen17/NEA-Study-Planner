@@ -123,3 +123,16 @@ Average confidence rating should only be calculated from tasks that have been co
 ## Progress report feedback wording needs revisiting
 
 The current subject feedback on the Progress report ("You are falling behind in X...") can feel harsh and demotivating for a genuinely small gap, e.g. missing just one task out of a few shouldn't necessarily read as "falling behind." Wording and/or thresholds need softening, and should be reviewed against the new denominator/completion logic once it's fully bedded in, since the Progress report's subject_completion calculation may need the same treatment as the main Statistics screen.
+
+
+## Future development idea: email reminders
+
+Suggested by my computer science teacher. Currently reminders only appear as a popup while the program is open (a deliberate, documented limitation, see earlier notes/analysis), which means a user who doesn't open the app won't be reminded at all.
+
+Considered adding real email delivery, but decided this is a genuinely bigger undertaking than it first appears, and out of scope for this project's timeframe:
+- Requires storing user email addresses (new User field, new input screen)
+- Requires sending real email via smtplib with stored credentials (a genuine security consideration: where/how credentials would be stored) or a third-party email API (external dependency, possible cost/rate limits)
+- Requires the program to trigger reminders even when not open, which needs a background scheduling mechanism (e.g. Windows Task Scheduler or a separate background service), a substantially different architecture from the current "check on Dashboard load" approach
+- Introduces new failure modes to handle: no internet connection, invalid email address, provider blocking automated sends
+
+Decision: not building this now. Documenting as a future development suggestion for the final evaluation section, since it's a genuine and reasonable extension of the reminder system, just disproportionate in scope relative to the time available for this NEA.

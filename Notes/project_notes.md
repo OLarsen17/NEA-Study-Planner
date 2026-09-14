@@ -136,3 +136,12 @@ Considered adding real email delivery, but decided this is a genuinely bigger un
 - Introduces new failure modes to handle: no internet connection, invalid email address, provider blocking automated sends
 
 Decision: not building this now. Documenting as a future development suggestion for the final evaluation section, since it's a genuine and reasonable extension of the reminder system, just disproportionate in scope relative to the time available for this NEA.
+
+
+## Known limitation: past-week/month views may include tasks that didn't exist yet
+
+The current denominator rule ("a task counts unless completed strictly before the period started") doesn't account for when a task was actually created. This means navigating to a past week or month could show a task in that period's backlog even if the task didn't exist at that time yet (e.g. it was created today but you're looking back at last week).
+
+Considered adding a created_date field to Task to filter these out for historical accuracy, but decided against it for now: the denominator is primarily meant to be a meaningful current backlog figure, and past-period viewing is more of a secondary "look back" feature than a strict historical record. Adding this would require another date field and additional filtering logic on top of an already-tested, working system.
+
+Documented as a known limitation rather than fixed.

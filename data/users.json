@@ -65,5 +65,43 @@
             "reminder_days": 3
         },
         "created_date": "2026-09-04"
+    },
+    {
+        "username": "mjmjmj",
+        "password": "mjmjmjmj",
+        "tasks": [
+            {
+                "id": "df5b4aef-b16e-4073-8517-c1495da6c364",
+                "title": "Maths Hw STR",
+                "subject": "Maths",
+                "deadline": "14/09/2026",
+                "duration": 60,
+                "confidence_rating": 5,
+                "initial_confidence_rating": 3,
+                "completed": true,
+                "reminder_sent": true,
+                "elapsed_seconds": 0,
+                "completed_date": "2026-09-14"
+            }
+        ],
+        "sessions": [
+            {
+                "id": "e0c39c3a-e4ee-410c-b891-0b5867497c4d",
+                "task_id": "df5b4aef-b16e-4073-8517-c1495da6c364",
+                "start_time": "2026-09-14T10:07:07.826802",
+                "end_time": "2026-09-14T10:07:24.826802",
+                "duration": 0,
+                "duration_seconds": 17,
+                "task_subject": "Maths"
+            }
+        ],
+        "settings": {
+            "theme": "light",
+            "font_size": "medium",
+            "high_contrast": false,
+            "reminders_enabled": true,
+            "reminder_days": 3
+        },
+        "created_date": "2026-09-14"
     }
 ]

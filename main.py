@@ -1083,15 +1083,24 @@ class RevisionPlannerApp:
     def show_progress_report_screen(self):
         self.clear_screen()
 
-        week_start = self.current_week_start
-        week_end = week_start + timedelta(days=6)
+        if self.stats_view_mode == "weekly":
+            period_start = self.current_week_start
+            period_end = period_start + timedelta(days=6)
+        else:
+            period_start = self.current_month_start
+            _, period_end = self.get_month_range(period_start)
 
-        stats = self.calculate_statistics(start_date=week_start, end_date=week_end)
-
+        stats = self.calculate_statistics(start_date=period_start, end_date=period_end)
+        
         label = tk.Label(self.root, text="Progress Report", font=("Segoe UI", 16))
         label.pack(pady=10)
 
-        summary_text = f"You completed {stats['completed_count']} of {stats['total_count']} tasks and studied for {self.format_time_readable(stats['total_seconds'])}."
+        if self.stats_view_mode == "weekly":
+            period_text = f"the week of {period_start.strftime('%d %b')} – {period_end.strftime('%d %b %Y')}"
+        else:
+            period_text = period_start.strftime('%B %Y')
+
+        summary_text = f"For {period_text}, you completed {stats['completed_count']} of {stats['total_count']} tasks and studied for {self.format_time_readable(stats['total_seconds'])}."        
         summary_label = tk.Label(self.root, text=summary_text, wraplength=400)
         summary_label.pack(pady=5)
 
@@ -1111,6 +1120,8 @@ class RevisionPlannerApp:
             time_spent = stats['subject_totals'].get(subject, 0)
             has_time_spent = time_spent > 0
 
+            period_word = "this week" if self.stats_view_mode == "weekly" else "this month"
+
             if completed == total:
                 feedback_text = f"{subject}: You're doing great, fully up to date!"
             elif completed > 0 and has_time_spent:
@@ -1118,8 +1129,8 @@ class RevisionPlannerApp:
             elif completed == 0 and has_time_spent:
                 feedback_text = f"{subject}: You've been working on this but haven't finished a task yet."
             else:
-                feedback_text = f"{subject}: You haven't studied this yet this week, consider giving it some attention."
-
+                feedback_text = f"{subject}: You haven't studied this yet {period_word}, consider giving it some attention."
+                
             subject_row = tk.Label(feedback_frame, text=feedback_text, wraplength=400, justify="left", anchor="w")
             subject_row.pack(fill="x", pady=2)
 

@@ -51,12 +51,35 @@
                 "confidence_rating": 2,
                 "initial_confidence_rating": 2,
                 "completed": false,
-                "reminder_sent": false,
+                "reminder_sent": true,
                 "elapsed_seconds": 0,
                 "completed_date": null
+            },
+            {
+                "id": "802ac0b2-7902-47bf-9931-7026c63377b9",
+                "title": "Maths Addition Formulae",
+                "subject": "Maths",
+                "deadline": "23/09/2026",
+                "duration": 10,
+                "confidence_rating": 5,
+                "initial_confidence_rating": 3,
+                "completed": true,
+                "reminder_sent": true,
+                "elapsed_seconds": 0,
+                "completed_date": "2026-09-21"
             }
         ],
-        "sessions": [],
+        "sessions": [
+            {
+                "id": "f9e392a8-e599-499f-90ac-d8fd64f57c44",
+                "task_id": "802ac0b2-7902-47bf-9931-7026c63377b9",
+                "start_time": "2026-09-21T10:03:54.563400",
+                "end_time": "2026-09-21T10:05:56.563400",
+                "duration": 2,
+                "duration_seconds": 122,
+                "task_subject": "Maths"
+            }
+        ],
         "settings": {
             "theme": "light",
             "font_size": "medium",

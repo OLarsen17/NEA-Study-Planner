@@ -885,6 +885,44 @@ class RevisionPlannerApp:
             "subject_completion": subject_completion
         }
 
+    def calculate_advanced_statistics(self, start_date, end_date):
+        tasks = self.pending_user.tasks
+        sessions = self.pending_user.sessions
+
+        period_sessions = [s for s in sessions if start_date <= s.start_time.date() <= end_date]
+
+        time_by_task = {}
+        for session in period_sessions:
+            seconds = getattr(session, "duration_seconds", session.duration * 60)
+            time_by_task[session.task_id] = time_by_task.get(session.task_id, 0) + seconds
+
+        time_vs_estimate = []
+        for task in tasks:
+            actual_seconds = time_by_task.get(task.id, 0)
+            if actual_seconds == 0:
+                continue
+            estimated_seconds = task.duration * 60
+            time_vs_estimate.append({
+                "title": task.title,
+                "estimated_minutes": task.duration,
+                "actual_minutes": round(actual_seconds / 60, 1)
+            })
+
+        confidence_changes = []
+        for task in tasks:
+            if task.completed_date and start_date <= task.completed_date <= end_date:
+                if task.confidence_rating != task.initial_confidence_rating:
+                    confidence_changes.append({
+                        "title": task.title,
+                        "initial": task.initial_confidence_rating,
+                        "final": task.confidence_rating
+                    })
+
+        return {
+            "time_vs_estimate": time_vs_estimate,
+            "confidence_changes": confidence_changes
+        }
+
     def get_week_range(self, reference_date):
         monday = reference_date - timedelta(days=reference_date.weekday())
         sunday = monday + timedelta(days=6)
@@ -1022,7 +1060,99 @@ class RevisionPlannerApp:
         progress_report_button = tk.Button(self.root, text="View progress report →", command=self.show_progress_report_screen)
         progress_report_button.pack(pady=5)
 
+        more_stats_button = tk.Button(self.root, text="More statistics/graphs →", command=self.show_advanced_statistics_screen)
+        more_stats_button.pack(pady=5)
+
         back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
+        back_button.pack(pady=10)
+
+    def show_advanced_statistics_screen(self):
+        self.clear_screen()
+
+        if self.stats_view_mode == "weekly":
+            period_start = self.current_week_start
+            period_end = period_start + timedelta(days=6)
+            period_label_text = f"Week of {period_start.strftime('%d %b')} – {period_end.strftime('%d %b %Y')}"
+        else:
+            period_start = self.current_month_start
+            _, period_end = self.get_month_range(period_start)
+            period_label_text = period_start.strftime('%B %Y')
+
+        advanced_stats = self.calculate_advanced_statistics(period_start, period_end)
+
+        label = tk.Label(self.root, text="More Statistics", font=("Segoe UI", 16))
+        label.pack(pady=10)
+
+        period_label = tk.Label(self.root, text=period_label_text)
+        period_label.pack(pady=5)
+
+        charts_frame = tk.Frame(self.root)
+        charts_frame.pack(pady=10)
+
+        time_frame = tk.Frame(charts_frame)
+        time_frame.pack(side="left", padx=10)
+
+        time_data = advanced_stats["time_vs_estimate"]
+
+        if time_data:
+            time_figure = Figure(figsize=(4, 3), dpi=80)
+            time_ax = time_figure.add_subplot()
+
+            titles = [t["title"] for t in time_data]
+            estimated = [t["estimated_minutes"] for t in time_data]
+            actual = [t["actual_minutes"] for t in time_data]
+
+            x_positions = range(len(titles))
+            bar_width = 0.35
+
+            time_ax.bar([x - bar_width/2 for x in x_positions], estimated, bar_width, label="Estimated")
+            time_ax.bar([x + bar_width/2 for x in x_positions], actual, bar_width, label="Actual")
+            time_ax.set_xticks(list(x_positions))
+            time_ax.set_xticklabels(titles, rotation=30, ha="right", fontsize=7)
+            time_ax.set_title("Estimated vs Actual Time (mins)")
+            time_ax.legend(fontsize=7)
+            time_figure.tight_layout()
+
+            time_canvas = FigureCanvasTkAgg(time_figure, master=time_frame)
+            time_canvas.draw()
+            time_canvas.get_tk_widget().pack()
+        else:
+            no_time_label = tk.Label(time_frame, text="No studied tasks this period")
+            no_time_label.pack()
+
+        confidence_frame = tk.Frame(charts_frame)
+        confidence_frame.pack(side="left", padx=10)
+
+        confidence_data = advanced_stats["confidence_changes"]
+
+        if confidence_data:
+            confidence_figure = Figure(figsize=(4, 3), dpi=80)
+            confidence_ax = confidence_figure.add_subplot()
+
+            titles = [c["title"] for c in confidence_data]
+            initial = [c["initial"] for c in confidence_data]
+            final = [c["final"] for c in confidence_data]
+
+            x_positions = range(len(titles))
+            bar_width = 0.35
+
+            confidence_ax.bar([x - bar_width/2 for x in x_positions], initial, bar_width, label="Before")
+            confidence_ax.bar([x + bar_width/2 for x in x_positions], final, bar_width, label="After")
+            confidence_ax.set_xticks(list(x_positions))
+            confidence_ax.set_xticklabels(titles, rotation=30, ha="right", fontsize=7)
+            confidence_ax.set_title("Confidence Change")
+            confidence_ax.set_ylim(0, 5.5)
+            confidence_ax.legend(fontsize=7)
+            confidence_figure.tight_layout()
+
+            confidence_canvas = FigureCanvasTkAgg(confidence_figure, master=confidence_frame)
+            confidence_canvas.draw()
+            confidence_canvas.get_tk_widget().pack()
+        else:
+            no_confidence_label = tk.Label(confidence_frame, text="No confidence changes this period")
+            no_confidence_label.pack()
+
+        back_button = tk.Button(self.root, text="Back to Statistics", command=self.show_statistics_screen)
         back_button.pack(pady=10)
 
     def change_stats_view(self, choice):

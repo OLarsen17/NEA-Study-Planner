@@ -23,6 +23,7 @@ class RevisionPlannerApp:
         self.current_week_start = None
         self.stats_view_mode = "weekly"
         self.current_month_start = None
+        self.current_stats_screen = "statistics"
 
         self.show_welcome_screen()
 
@@ -941,6 +942,7 @@ class RevisionPlannerApp:
         return f"{minutes}m {seconds}s"
 
     def show_statistics_screen(self):
+        self.current_stats_screen = "statistics"
         self.clear_screen()
 
         if self.current_week_start is None:
@@ -1067,6 +1069,7 @@ class RevisionPlannerApp:
         back_button.pack(pady=10)
 
     def show_advanced_statistics_screen(self):
+        self.current_stats_screen = "advanced"
         self.clear_screen()
 
         if self.stats_view_mode == "weekly":
@@ -1085,6 +1088,18 @@ class RevisionPlannerApp:
 
         period_label = tk.Label(self.root, text=period_label_text)
         period_label.pack(pady=5)
+
+        nav_frame = tk.Frame(self.root)
+        nav_frame.pack(pady=5)
+
+        prev_button = tk.Button(nav_frame, text="← Previous", command=self.go_to_previous_period)
+        prev_button.pack(side="left", padx=5)
+
+        next_button = tk.Button(nav_frame, text="Next →", command=self.go_to_next_period)
+        next_button.pack(side="left", padx=5)
+
+        today_button = tk.Button(nav_frame, text="Today", command=self.go_to_current_period)
+        today_button.pack(side="left", padx=5)
 
         charts_frame = tk.Frame(self.root)
         charts_frame.pack(pady=10)
@@ -1164,7 +1179,7 @@ class RevisionPlannerApp:
             self.current_week_start, _ = self.get_week_range(datetime.now().date())
         else:
             self.current_month_start, _ = self.get_month_range(datetime.now().date())
-        self.show_statistics_screen()
+        self.show_current_stats_screen()
 
     def go_to_previous_period(self):
         if self.stats_view_mode == "weekly":
@@ -1186,7 +1201,7 @@ class RevisionPlannerApp:
                 return
             self.current_month_start = new_start
 
-        self.show_statistics_screen()
+        self.show_current_stats_screen()
 
     def go_to_next_period(self):
         if self.stats_view_mode == "weekly":
@@ -1208,9 +1223,18 @@ class RevisionPlannerApp:
                 return
             self.current_month_start = new_start
 
-        self.show_statistics_screen()
+        self.show_current_stats_screen()
+
+    def show_current_stats_screen(self):
+        if self.current_stats_screen == "progress_report":
+            self.show_progress_report_screen()
+        elif self.current_stats_screen == "advanced":
+            self.show_advanced_statistics_screen()
+        else:
+            self.show_statistics_screen()
 
     def show_progress_report_screen(self):
+        self.current_stats_screen = "progress_report"
         self.clear_screen()
 
         if self.stats_view_mode == "weekly":
@@ -1229,6 +1253,18 @@ class RevisionPlannerApp:
             period_text = f"the week of {period_start.strftime('%d %b')} – {period_end.strftime('%d %b %Y')}"
         else:
             period_text = period_start.strftime('%B %Y')
+
+        nav_frame = tk.Frame(self.root)
+        nav_frame.pack(pady=5)
+
+        prev_button = tk.Button(nav_frame, text="← Previous", command=self.go_to_previous_period)
+        prev_button.pack(side="left", padx=5)
+
+        next_button = tk.Button(nav_frame, text="Next →", command=self.go_to_next_period)
+        next_button.pack(side="left", padx=5)
+
+        today_button = tk.Button(nav_frame, text="Today", command=self.go_to_current_period)
+        today_button.pack(side="left", padx=5)
 
         summary_text = f"For {period_text}, you completed {stats['completed_count']} of {stats['total_count']} tasks and studied for {self.format_time_readable(stats['total_seconds'])}."        
         summary_label = tk.Label(self.root, text=summary_text, wraplength=400)

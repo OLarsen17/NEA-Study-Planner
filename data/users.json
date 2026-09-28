@@ -78,6 +78,15 @@
                 "duration": 2,
                 "duration_seconds": 122,
                 "task_subject": "Maths"
+            },
+            {
+                "id": "b1f87008-793e-442a-8133-2987dbc6efab",
+                "task_id": "2994e523-90d5-4ec7-8929-b1d2c12a45cc",
+                "start_time": "2026-09-21T10:29:32.894482",
+                "end_time": "2026-09-21T10:29:32.894482",
+                "duration": 0,
+                "duration_seconds": 0,
+                "task_subject": "Biology"
             }
         ],
         "settings": {

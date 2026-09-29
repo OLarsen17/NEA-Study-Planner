@@ -13,13 +13,25 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 
+# ----- THEME CONSTANTS -----
+COLOUR_BG = "#f3f6fa"
+COLOUR_SIDEBAR = "#e8eef5"
+COLOUR_ACCENT = "#2f6fb0"
+COLOUR_ACCENT_TEXT = "#ffffff"
+COLOUR_TEXT_DARK = "#16324f"
+COLOUR_TEXT_MUTED = "#5a6b7d"
+COLOUR_CARD_BORDER = "#d4dae2"
+COLOUR_URGENT = "#d9534f"
+COLOUR_SOON = "#e0a52f"
+COLOUR_LATER = "#2f6fb0"
+
 
 
 class RevisionPlannerApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Revision Planner")
-        self.root.geometry("500x400")
+        self.root.geometry("800x550")
         self.current_week_start = None
         self.stats_view_mode = "weekly"
         self.current_month_start = None
@@ -198,52 +210,63 @@ class RevisionPlannerApp:
         self.check_reminders()
         self.clear_screen()
 
-        welcome_label = tk.Label(self.root, text=f"Welcome back, {self.pending_user.username}", font=("Segoe UI", 16))
-        welcome_label.pack(pady=10)
+        content = self.build_sidebar("Home")
 
-        subtitle_label = tk.Label(self.root, text="Here's what's coming up")
-        subtitle_label.pack()
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True, padx=24, pady=18)
 
-        deadlines_label = tk.Label(self.root, text="Upcoming Deadlines", font=("Segoe UI", 12))
-        deadlines_label.pack(pady=10)
+        welcome_label = tk.Label(inner, text=f"Welcome back, {self.pending_user.username}", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        welcome_label.pack(fill="x")
+
+        subtitle_label = tk.Label(inner, text="Here's what's coming up", font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
+        subtitle_label.pack(fill="x", pady=(0, 16))
+
+        deadlines_label = tk.Label(inner, text="Upcoming deadlines", font=("Segoe UI", 11, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        deadlines_label.pack(fill="x", pady=(0, 6))
 
         upcoming_tasks = self.get_upcoming_tasks()
 
-        if not upcoming_tasks: #makes sure it doesnt crash if user has no tasks
-            no_tasks_label = tk.Label(self.root, text="No upcoming deadlines")
-            no_tasks_label.pack()
+        if not upcoming_tasks:
+            no_tasks_label = tk.Label(inner, text="No upcoming deadlines", bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
+            no_tasks_label.pack(fill="x")
         else:
             for task, days_remaining in upcoming_tasks:
                 if days_remaining < 0:
                     urgency_text = "Overdue"
+                    badge_colour = COLOUR_URGENT
                 elif days_remaining == 0:
                     urgency_text = "Due today"
+                    badge_colour = COLOUR_URGENT
                 elif days_remaining == 1:
                     urgency_text = "Due tomorrow"
+                    badge_colour = COLOUR_URGENT
+                elif days_remaining <= 7:
+                    urgency_text = f"{days_remaining} days left"
+                    badge_colour = COLOUR_SOON
                 else:
                     urgency_text = f"{days_remaining} days left"
+                    badge_colour = COLOUR_LATER
 
-                task_text = f"{task.title} — Due {task.deadline} — {urgency_text}"
-                task_label = tk.Label(self.root, text=task_text)
-                task_label.pack()
+                card = tk.Frame(inner, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+                card.pack(fill="x", pady=4)
 
-        add_task_button = tk.Button(self.root, text="+ Add new task", command=self.show_add_task_screen) #add task button
-        add_task_button.pack(pady=10)
+                text_frame = tk.Frame(card, bg="#ffffff")
+                text_frame.pack(side="left", fill="x", expand=True, padx=10, pady=8)
 
-        view_tasks_button = tk.Button(self.root, text="View all tasks", command=self.show_task_list_screen)
-        view_tasks_button.pack(pady=5)
+                title_label = tk.Label(text_frame, text=task.title, font=("Segoe UI", 10, "bold"), bg="#ffffff", fg=COLOUR_TEXT_DARK, anchor="w")
+                title_label.pack(fill="x")
 
-        timer_button = tk.Button(self.root, text="Study Timer", command=self.show_timer_task_select_screen)
-        timer_button.pack(pady=5)
+                date_label = tk.Label(text_frame, text=f"Due {task.deadline}", font=("Segoe UI", 9), bg="#ffffff", fg=COLOUR_TEXT_MUTED, anchor="w")
+                date_label.pack(fill="x")
 
-        settings_button = tk.Button(self.root, text="Settings", command=self.show_settings_screen)
-        settings_button.pack(pady=5)
+                badge = tk.Label(card, text=urgency_text, bg=badge_colour, fg="#ffffff", font=("Segoe UI", 9), padx=8, pady=2)
+                badge.pack(side="right", padx=10)
 
-        #test_stats_button = tk.Button(self.root, text="TEST: Print stats", command=self.print_test_statistics)
-        #test_stats_button.pack(pady=5)
+        add_task_button = tk.Button(inner, text="+ Add new task", command=self.show_add_task_screen, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=("Segoe UI", 10), pady=6, cursor="hand2")
+        add_task_button.pack(fill="x", pady=(16, 0))
 
-        statistics_button = tk.Button(self.root, text="Statistics", command=self.show_statistics_screen)
-        statistics_button.pack(pady=5)
+        add_task_button.bind("<Enter>", lambda event: add_task_button.config(bg="#25578c"))
+        add_task_button.bind("<Leave>", lambda event: add_task_button.config(bg=COLOUR_ACCENT))
 
     def get_upcoming_tasks(self):
         upcoming = []
@@ -1311,6 +1334,53 @@ class RevisionPlannerApp:
             next_month_start = reference_date.replace(month=reference_date.month + 1, day=1)
         month_end = next_month_start - timedelta(days=1)
         return month_start, month_end
+
+
+#------GUI------#
+
+    def build_sidebar(self, active_screen):
+        self.root.configure(bg=COLOUR_BG)
+
+        sidebar = tk.Frame(self.root, bg=COLOUR_SIDEBAR, width=140)
+        sidebar.pack(side="left", fill="y")
+        sidebar.pack_propagate(False)
+
+        top_items = [
+            ("Home", self.show_dashboard),
+            ("Tasks", self.show_task_list_screen),
+            ("Study Timer", self.show_timer_task_select_screen),
+            ("Statistics", self.show_statistics_screen),
+        ]
+
+        bottom_items = [
+            ("Logout", self.show_welcome_screen),
+            ("Settings", self.show_settings_screen),
+        ]
+
+        for label, command in top_items:
+            self.create_sidebar_item(sidebar, label, command, label == active_screen, "top")
+
+        for label, command in bottom_items:
+            self.create_sidebar_item(sidebar, label, command, label == active_screen, "bottom")
+
+        content = tk.Frame(self.root, bg=COLOUR_BG)
+        content.pack(side="left", fill="both", expand=True)
+
+        return content
+
+    def create_sidebar_item(self, sidebar, label, command, is_active, position):
+        item_bg = COLOUR_ACCENT if is_active else COLOUR_SIDEBAR
+        item_fg = COLOUR_ACCENT_TEXT if is_active else COLOUR_TEXT_DARK
+        hover_bg = COLOUR_ACCENT if is_active else "#dce6f0"
+
+        item = tk.Label(sidebar, text=label, bg=item_bg, fg=item_fg, font=("Segoe UI", 10), anchor="w", padx=14, pady=9, cursor="hand2")
+        item.pack(fill="x", padx=6, pady=2, side=position)
+        item.bind("<Button-1>", lambda event: command())
+
+        if not is_active:
+            item.bind("<Enter>", lambda event: item.config(bg=hover_bg))
+            item.bind("<Leave>", lambda event: item.config(bg=item_bg))
+
 
 if __name__ == "__main__":
     root = tk.Tk()

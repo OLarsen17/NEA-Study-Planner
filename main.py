@@ -372,36 +372,46 @@ class RevisionPlannerApp:
     def show_task_list_screen(self):
         self.clear_screen()
 
-        label = tk.Label(self.root, text="Your Tasks", font=("Segoe UI", 16))
-        label.pack(pady=10)
+        content = self.build_sidebar("Tasks")
 
-        add_task_button = tk.Button(self.root, text="+ Add new task", command=self.show_add_task_screen)
-        add_task_button.pack(pady=5)
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True, padx=24, pady=18)
 
-        self.sort_var = tk.StringVar(value="Deadline") #
+        header_frame = tk.Frame(inner, bg=COLOUR_BG)
+        header_frame.pack(fill="x")
+
+        label = tk.Label(header_frame, text="Your Tasks", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack(side="left")
+
+        add_task_button = tk.Button(header_frame, text="+ Add new task", command=self.show_add_task_screen, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=("Segoe UI", 9), padx=10, pady=4, cursor="hand2")
+        add_task_button.pack(side="right")
+        add_task_button.bind("<Enter>", lambda event: add_task_button.config(bg="#25578c"))
+        add_task_button.bind("<Leave>", lambda event: add_task_button.config(bg=COLOUR_ACCENT))
+
+        self.sort_var = tk.StringVar(value="Deadline")
         self.filter_var = tk.StringVar(value="Incomplete Only")
         self.subject_filter_var = tk.StringVar(value="All Subjects")
 
-        controls_frame = tk.Frame(self.root)
-        controls_frame.pack(pady=5)
+        controls_frame = tk.Frame(inner, bg=COLOUR_BG)
+        controls_frame.pack(fill="x", pady=(14, 10))
 
-        sort_menu = tk.OptionMenu(controls_frame, self.sort_var, "Deadline", "Name", "Duration", command=lambda _: self.refresh_task_list()) #dropdown widget
-        sort_menu.pack(side="left", padx=5)
+        sort_menu = tk.OptionMenu(controls_frame, self.sort_var, "Deadline", "Name", "Duration", command=lambda _: self.refresh_task_list())
+        sort_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
+        sort_menu.pack(side="left", padx=(0, 8))
 
         filter_menu = tk.OptionMenu(controls_frame, self.filter_var, "Incomplete Only", "Complete Only", "All", command=lambda _: self.refresh_task_list())
-        filter_menu.pack(side="left", padx=5)
+        filter_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
+        filter_menu.pack(side="left", padx=8)
 
         subject_options = ["All Subjects"] + self.get_existing_subjects()
         subject_filter_menu = tk.OptionMenu(controls_frame, self.subject_filter_var, *subject_options, command=lambda _: self.refresh_task_list())
-        subject_filter_menu.pack(side="left", padx=5)
+        subject_filter_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
+        subject_filter_menu.pack(side="left", padx=8)
 
-        self.task_list_frame = tk.Frame(self.root)
-        self.task_list_frame.pack(pady=10)
+        self.task_list_frame = tk.Frame(inner, bg=COLOUR_BG)
+        self.task_list_frame.pack(fill="both", expand=True)
 
-        self.refresh_task_list() #refreshes what was sorted
-
-        back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
-        back_button.pack(pady=10)
+        self.refresh_task_list()
 
     def refresh_task_list(self):
         for widget in self.task_list_frame.winfo_children():
@@ -417,7 +427,7 @@ class RevisionPlannerApp:
 
         subject_choice = self.subject_filter_var.get()
         if subject_choice != "All Subjects":
-            tasks = [t for t in tasks if t.subject == subject_choice] 
+            tasks = [t for t in tasks if t.subject == subject_choice]
 
         sort_choice = self.sort_var.get()
         if sort_choice == "Deadline":
@@ -428,16 +438,16 @@ class RevisionPlannerApp:
             tasks = sorted(tasks, key=lambda t: t.duration)
 
         if not tasks:
-            no_tasks_label = tk.Label(self.task_list_frame, text="No tasks to show")
-            no_tasks_label.pack()
+            no_tasks_label = tk.Label(self.task_list_frame, text="No tasks to show", bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+            no_tasks_label.pack(pady=10)
 
         for task in tasks:
-            row = tk.Frame(self.task_list_frame)
-            row.pack(fill="x", pady=2)
+            row = tk.Frame(self.task_list_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+            row.pack(fill="x", pady=3)
 
             completed_var = tk.BooleanVar(value=task.completed)
-            complete_checkbox = tk.Checkbutton(row, variable=completed_var, command=lambda t=task, v=completed_var: self.toggle_task_complete(t, v))
-            complete_checkbox.pack(side="left")
+            complete_checkbox = tk.Checkbutton(row, variable=completed_var, bg="#ffffff", command=lambda t=task, v=completed_var: self.toggle_task_complete(t, v))
+            complete_checkbox.pack(side="left", padx=(10, 4))
 
             if task.completed:
                 if task.confidence_rating != task.initial_confidence_rating:
@@ -447,15 +457,20 @@ class RevisionPlannerApp:
             else:
                 confidence_text = f"Confidence: {task.confidence_rating}"
 
-            info_text = f"{task.title} — {task.subject} — Due {task.deadline} — {confidence_text}"
-            info_label = tk.Label(row, text=info_text)
-            info_label.pack(side="left", padx=5)
+            text_frame = tk.Frame(row, bg="#ffffff")
+            text_frame.pack(side="left", fill="x", expand=True, pady=8)
 
-            edit_button = tk.Button(row, text="Edit", command=lambda t=task: self.show_edit_task_screen(t))
-            edit_button.pack(side="right", padx=2)
+            title_label = tk.Label(text_frame, text=task.title, font=("Segoe UI", 10, "bold"), bg="#ffffff", fg=COLOUR_TEXT_DARK, anchor="w")
+            title_label.pack(fill="x")
 
-            delete_button = tk.Button(row, text="Delete", command=lambda t=task: self.confirm_delete_task(t))
-            delete_button.pack(side="right", padx=2)
+            meta_label = tk.Label(text_frame, text=f"{task.subject} — Due {task.deadline} — {confidence_text}", font=("Segoe UI", 9), bg="#ffffff", fg=COLOUR_TEXT_MUTED, anchor="w")
+            meta_label.pack(fill="x")
+
+            delete_button = tk.Button(row, text="Delete", command=lambda t=task: self.confirm_delete_task(t), relief="flat", bg="#f0f0f0", font=("Segoe UI", 9), cursor="hand2")
+            delete_button.pack(side="right", padx=(4, 10), pady=8)
+
+            edit_button = tk.Button(row, text="Edit", command=lambda t=task: self.show_edit_task_screen(t), relief="flat", bg="#f0f0f0", font=("Segoe UI", 9), cursor="hand2")
+            edit_button.pack(side="right", padx=4, pady=8)
 
     def toggle_task_complete(self, task, completed_var):
         task.completed = completed_var.get()

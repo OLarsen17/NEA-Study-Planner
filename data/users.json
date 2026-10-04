@@ -67,6 +67,19 @@
                 "reminder_sent": true,
                 "elapsed_seconds": 0,
                 "completed_date": "2026-09-21"
+            },
+            {
+                "id": "1aa2eecc-60f9-4061-924a-10228c6da29c",
+                "title": "7E Qu5-10",
+                "subject": "Maths",
+                "deadline": "08/10/2026",
+                "duration": 120,
+                "confidence_rating": 3,
+                "initial_confidence_rating": 2,
+                "completed": false,
+                "reminder_sent": false,
+                "elapsed_seconds": 0,
+                "completed_date": null
             }
         ],
         "sessions": [
@@ -135,5 +148,19 @@
             "reminder_days": 3
         },
         "created_date": "2026-09-14"
+    },
+    {
+        "username": "VIDBETTERTHANONYOL",
+        "password": "vidushee1312",
+        "tasks": [],
+        "sessions": [],
+        "settings": {
+            "theme": "light",
+            "font_size": "medium",
+            "high_contrast": false,
+            "reminders_enabled": true,
+            "reminder_days": 3
+        },
+        "created_date": "2026-09-30"
     }
 ]

@@ -287,41 +287,51 @@ class RevisionPlannerApp:
     def show_add_task_screen(self):
         self.clear_screen()
 
-        label = tk.Label(self.root, text="Add New Task", font=("Segoe UI", 16))
-        label.pack(pady=10)
+        content = self.build_sidebar("Tasks")
 
-        title_label = tk.Label(self.root, text="Task Title")
-        title_label.pack()
-        self.task_title_entry = tk.Entry(self.root)
-        self.task_title_entry.pack(pady=5)
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True, padx=24, pady=18)
 
-        subject_label = tk.Label(self.root, text="Subject")
-        subject_label.pack()
+        label = tk.Label(inner, text="Add New Task", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack(anchor="w", pady=(0, 16))
+
+        title_label = tk.Label(inner, text="Task Title", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        title_label.pack(fill="x")
+        self.task_title_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
+        self.task_title_entry.pack(fill="x", ipady=4, pady=(2, 12))
+
+        subject_label = tk.Label(inner, text="Subject", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        subject_label.pack(fill="x")
         existing_subjects = self.get_existing_subjects()
-        self.task_subject_entry = ttk.Combobox(self.root, values=existing_subjects)
-        self.task_subject_entry.pack(pady=5)
+        self.task_subject_entry = ttk.Combobox(inner, values=existing_subjects, font=("Segoe UI", 10))
+        self.task_subject_entry.pack(fill="x", ipady=2, pady=(2, 12))
 
-        deadline_label = tk.Label(self.root, text="Deadline (DD/MM/YYYY)")
-        deadline_label.pack()
-        self.task_deadline_entry = tk.Entry(self.root)
-        self.task_deadline_entry.pack(pady=5)
+        deadline_label = tk.Label(inner, text="Deadline (DD/MM/YYYY)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        deadline_label.pack(fill="x")
+        self.task_deadline_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
+        self.task_deadline_entry.pack(fill="x", ipady=4, pady=(2, 12))
 
-        duration_label = tk.Label(self.root, text="Estimated Study Time (mins)")
-        duration_label.pack()
-        self.task_duration_entry = tk.Entry(self.root)
-        self.task_duration_entry.pack(pady=5)
+        duration_label = tk.Label(inner, text="Estimated Study Time (mins)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        duration_label.pack(fill="x")
+        self.task_duration_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
+        self.task_duration_entry.pack(fill="x", ipady=4, pady=(2, 12))
 
-        confidence_label = tk.Label(self.root, text="Confidence Rating (1-5)")
-        confidence_label.pack()
-        self.task_confidence_entry = ttk.Spinbox(self.root, from_=1, to=5, width=5, state="readonly")
+        confidence_label = tk.Label(inner, text="Confidence Rating (1-5)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        confidence_label.pack(fill="x")
+        self.task_confidence_entry = ttk.Spinbox(inner, from_=1, to=5, width=5, state="readonly", font=("Segoe UI", 10))
         self.task_confidence_entry.set(3)
-        self.task_confidence_entry.pack(pady=5)
+        self.task_confidence_entry.pack(anchor="w", ipady=2, pady=(2, 16))
 
-        save_button = tk.Button(self.root, text="Save Task", command=self.save_task)
-        save_button.pack(pady=10)
+        button_frame = tk.Frame(inner, bg=COLOUR_BG)
+        button_frame.pack(fill="x")
 
-        cancel_button = tk.Button(self.root, text="Cancel", command=self.show_dashboard)
-        cancel_button.pack(pady=5)
+        save_button = tk.Button(button_frame, text="Save Task", command=self.save_task, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=("Segoe UI", 10), padx=16, pady=6, cursor="hand2")
+        save_button.pack(side="left")
+        save_button.bind("<Enter>", lambda event: save_button.config(bg="#25578c"))
+        save_button.bind("<Leave>", lambda event: save_button.config(bg=COLOUR_ACCENT))
+
+        cancel_button = tk.Button(button_frame, text="Cancel", command=self.show_dashboard, relief="flat", bg="#f0f0f0", font=("Segoe UI", 10), padx=16, pady=6, cursor="hand2")
+        cancel_button.pack(side="left", padx=8)
 
     def get_existing_subjects(self):
         subjects = []
@@ -485,45 +495,55 @@ class RevisionPlannerApp:
         self.clear_screen()
         self.editing_task = task
 
-        label = tk.Label(self.root, text="Edit Task", font=("Segoe UI", 16))
-        label.pack(pady=10)
+        content = self.build_sidebar("Tasks")
 
-        title_label = tk.Label(self.root, text="Task Title")
-        title_label.pack()
-        self.edit_title_entry = tk.Entry(self.root)
-        self.edit_title_entry.insert(0, task.title) #inserts existing text to be edited
-        self.edit_title_entry.pack(pady=5)
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True, padx=24, pady=18)
 
-        subject_label = tk.Label(self.root, text="Subject")
-        subject_label.pack()
+        label = tk.Label(inner, text="Edit Task", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack(anchor="w", pady=(0, 16))
+
+        title_label = tk.Label(inner, text="Task Title", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        title_label.pack(fill="x")
+        self.edit_title_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
+        self.edit_title_entry.insert(0, task.title)
+        self.edit_title_entry.pack(fill="x", ipady=4, pady=(2, 12))
+
+        subject_label = tk.Label(inner, text="Subject", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        subject_label.pack(fill="x")
         existing_subjects = self.get_existing_subjects()
-        self.edit_subject_entry = ttk.Combobox(self.root, values=existing_subjects)
+        self.edit_subject_entry = ttk.Combobox(inner, values=existing_subjects, font=("Segoe UI", 10))
         self.edit_subject_entry.insert(0, task.subject)
-        self.edit_subject_entry.pack(pady=5)
+        self.edit_subject_entry.pack(fill="x", ipady=2, pady=(2, 12))
 
-        deadline_label = tk.Label(self.root, text="Deadline (DD/MM/YYYY)")
-        deadline_label.pack()
-        self.edit_deadline_entry = tk.Entry(self.root)
+        deadline_label = tk.Label(inner, text="Deadline (DD/MM/YYYY)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        deadline_label.pack(fill="x")
+        self.edit_deadline_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
         self.edit_deadline_entry.insert(0, task.deadline)
-        self.edit_deadline_entry.pack(pady=5)
+        self.edit_deadline_entry.pack(fill="x", ipady=4, pady=(2, 12))
 
-        duration_label = tk.Label(self.root, text="Estimated Study Time (mins)")
-        duration_label.pack()
-        self.edit_duration_entry = tk.Entry(self.root)
+        duration_label = tk.Label(inner, text="Estimated Study Time (mins)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        duration_label.pack(fill="x")
+        self.edit_duration_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
         self.edit_duration_entry.insert(0, str(task.duration))
-        self.edit_duration_entry.pack(pady=5)
+        self.edit_duration_entry.pack(fill="x", ipady=4, pady=(2, 12))
 
-        confidence_label = tk.Label(self.root, text="Confidence Rating (1-5)")
-        confidence_label.pack()
-        self.edit_confidence_entry = ttk.Spinbox(self.root, from_=1, to=5, width=5, state="readonly")
+        confidence_label = tk.Label(inner, text="Confidence Rating (1-5)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        confidence_label.pack(fill="x")
+        self.edit_confidence_entry = ttk.Spinbox(inner, from_=1, to=5, width=5, state="readonly", font=("Segoe UI", 10))
         self.edit_confidence_entry.set(task.confidence_rating)
-        self.edit_confidence_entry.pack(pady=5)
+        self.edit_confidence_entry.pack(anchor="w", ipady=2, pady=(2, 16))
 
-        save_button = tk.Button(self.root, text="Save Changes", command=self.save_edited_task)
-        save_button.pack(pady=10)
+        button_frame = tk.Frame(inner, bg=COLOUR_BG)
+        button_frame.pack(fill="x")
 
-        cancel_button = tk.Button(self.root, text="Cancel", command=self.show_task_list_screen)
-        cancel_button.pack(pady=5)
+        save_button = tk.Button(button_frame, text="Save Changes", command=self.save_edited_task, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=("Segoe UI", 10), padx=16, pady=6, cursor="hand2")
+        save_button.pack(side="left")
+        save_button.bind("<Enter>", lambda event: save_button.config(bg="#25578c"))
+        save_button.bind("<Leave>", lambda event: save_button.config(bg=COLOUR_ACCENT))
+
+        cancel_button = tk.Button(button_frame, text="Cancel", command=self.show_task_list_screen, relief="flat", bg="#f0f0f0", font=("Segoe UI", 10), padx=16, pady=6, cursor="hand2")
+        cancel_button.pack(side="left", padx=8)
 
     def save_edited_task(self):
         title = self.edit_title_entry.get()

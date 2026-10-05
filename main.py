@@ -850,48 +850,52 @@ class RevisionPlannerApp:
     def show_settings_screen(self):
         self.clear_screen()
 
-        label = tk.Label(self.root, text="Settings", font=("Segoe UI", 16))
-        label.pack(pady=10)
+        content = self.build_sidebar("Settings")
+
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True, padx=24, pady=18)
+
+        label = tk.Label(inner, text="Settings", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack(anchor="w", pady=(0, 16))
 
         settings = self.pending_user.settings
 
-        appearance_label = tk.Label(self.root, text="Appearance", font=("Segoe UI", 12))
-        appearance_label.pack(pady=(10, 0))
+        appearance_label = tk.Label(inner, text="APPEARANCE", font=("Segoe UI", 9, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
+        appearance_label.pack(fill="x", pady=(0, 8))
 
-        theme_label = tk.Label(self.root, text="Theme")
-        theme_label.pack()
+        theme_label = tk.Label(inner, text="Theme", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9), anchor="w")
+        theme_label.pack(fill="x")
         self.theme_var = tk.StringVar(value=settings.theme)
-        theme_menu = tk.OptionMenu(self.root, self.theme_var, "light", "dark")
-        theme_menu.pack(pady=5)
+        theme_menu = tk.OptionMenu(inner, self.theme_var, "light", "dark")
+        theme_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
+        theme_menu.pack(anchor="w", pady=(2, 12))
 
-        font_size_label = tk.Label(self.root, text="Font size")
-        font_size_label.pack()
+        font_size_label = tk.Label(inner, text="Font size", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9), anchor="w")
+        font_size_label.pack(fill="x")
         self.font_size_var = tk.StringVar(value=settings.font_size)
-        font_size_menu = tk.OptionMenu(self.root, self.font_size_var, "small", "medium", "large")
-        font_size_menu.pack(pady=5)
+        font_size_menu = tk.OptionMenu(inner, self.font_size_var, "small", "medium", "large")
+        font_size_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
+        font_size_menu.pack(anchor="w", pady=(2, 12))
 
         self.high_contrast_var = tk.BooleanVar(value=settings.high_contrast)
-        high_contrast_checkbox = tk.Checkbutton(self.root, text="High Contrast Mode", variable=self.high_contrast_var)
-        high_contrast_checkbox.pack(pady=5)
+        high_contrast_checkbox = tk.Checkbutton(inner, text="High Contrast Mode", variable=self.high_contrast_var, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        high_contrast_checkbox.pack(anchor="w", pady=(0, 20))
 
-        reminders_label = tk.Label(self.root, text="Reminders", font=("Segoe UI", 12))
-        reminders_label.pack(pady=(15, 0))
+        reminders_label = tk.Label(inner, text="REMINDERS", font=("Segoe UI", 9, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
+        reminders_label.pack(fill="x", pady=(0, 8))
 
         self.reminders_enabled_var = tk.BooleanVar(value=settings.reminders_enabled)
-        reminders_checkbox = tk.Checkbutton(self.root, text="Enable reminders", variable=self.reminders_enabled_var)
-        reminders_checkbox.pack(pady=5)
+        reminders_checkbox = tk.Checkbutton(inner, text="Enable reminders", variable=self.reminders_enabled_var, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        reminders_checkbox.pack(anchor="w", pady=(0, 10))
 
-        reminder_days_label = tk.Label(self.root, text="Remind me this many days before a deadline")
-        reminder_days_label.pack()
-        self.reminder_days_entry = tk.Entry(self.root)
+        reminder_days_label = tk.Label(inner, text="Remind me this many days before a deadline", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9), anchor="w")
+        reminder_days_label.pack(fill="x")
+        self.reminder_days_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10), width=6)
         self.reminder_days_entry.insert(0, str(settings.reminder_days))
-        self.reminder_days_entry.pack(pady=5)
+        self.reminder_days_entry.pack(anchor="w", ipady=4, pady=(2, 20))
 
-        save_button = tk.Button(self.root, text="Save Settings", command=self.save_settings)
-        save_button.pack(pady=15)
-
-        back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
-        back_button.pack(pady=5)
+        save_button = self.build_flat_button(inner, "Save Settings", self.save_settings, accent=True)
+        save_button.pack(anchor="w")
 
     def save_settings(self):
         reminder_days_text = self.reminder_days_entry.get()

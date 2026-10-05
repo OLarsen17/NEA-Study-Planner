@@ -48,7 +48,7 @@
                 "subject": "Biology",
                 "deadline": "22/09/2026",
                 "duration": 30,
-                "confidence_rating": 2,
+                "confidence_rating": 3,
                 "initial_confidence_rating": 2,
                 "completed": false,
                 "reminder_sent": true,
@@ -99,6 +99,15 @@
                 "end_time": "2026-09-21T10:29:32.894482",
                 "duration": 0,
                 "duration_seconds": 0,
+                "task_subject": "Biology"
+            },
+            {
+                "id": "1e617d78-9297-459e-b886-7f1a2674bda4",
+                "task_id": "2994e523-90d5-4ec7-8929-b1d2c12a45cc",
+                "start_time": "2026-10-04T18:40:20.458786",
+                "end_time": "2026-10-04T18:40:25.458786",
+                "duration": 0,
+                "duration_seconds": 5,
                 "task_subject": "Biology"
             }
         ],

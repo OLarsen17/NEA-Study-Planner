@@ -600,27 +600,41 @@ class RevisionPlannerApp:
     def show_timer_task_select_screen(self):
         self.clear_screen()
 
-        label = tk.Label(self.root, text="Select a task to study", font=("Segoe UI", 16))
-        label.pack(pady=10)
+        content = self.build_sidebar("Study Timer")
+
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True, padx=24, pady=18)
+
+        label = tk.Label(inner, text="Select a task to study", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack(anchor="w", pady=(0, 16))
 
         incomplete_tasks = [t for t in self.pending_user.tasks if not t.completed]
 
         if not incomplete_tasks:
-            no_tasks_label = tk.Label(self.root, text="No incomplete tasks to study")
-            no_tasks_label.pack()
+            no_tasks_label = tk.Label(inner, text="No incomplete tasks to study", bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+            no_tasks_label.pack(pady=10)
         else:
             for task in incomplete_tasks:
                 if task.elapsed_seconds > 0:
                     minutes_so_far = task.elapsed_seconds // 60
-                    button_text = f"{task.title} ({task.subject}) — {minutes_so_far} min saved"
+                    meta_text = f"{task.subject} — {minutes_so_far} min saved"
                 else:
-                    button_text = f"{task.title} ({task.subject})"
+                    meta_text = task.subject
 
-                task_button = tk.Button(self.root, text=button_text, command=lambda t=task: self.open_timer_screen(t))
-                task_button.pack(pady=3)
+                card = tk.Frame(inner, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, cursor="hand2")
+                card.pack(fill="x", pady=3)
 
-        back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
-        back_button.pack(pady=10)
+                text_frame = tk.Frame(card, bg="#ffffff")
+                text_frame.pack(side="left", fill="x", expand=True, padx=10, pady=8)
+
+                title_label = tk.Label(text_frame, text=task.title, font=("Segoe UI", 10, "bold"), bg="#ffffff", fg=COLOUR_TEXT_DARK, anchor="w")
+                title_label.pack(fill="x")
+
+                meta_label = tk.Label(text_frame, text=meta_text, font=("Segoe UI", 9), bg="#ffffff", fg=COLOUR_TEXT_MUTED, anchor="w")
+                meta_label.pack(fill="x")
+
+                for widget in (card, text_frame, title_label, meta_label):
+                    widget.bind("<Button-1>", lambda event, t=task: self.open_timer_screen(t))
 
     def open_timer_screen(self, task):
         self.timer_task = task
@@ -630,43 +644,65 @@ class RevisionPlannerApp:
 
         self.clear_screen()
 
-        studying_label = tk.Label(self.root, text="Currently studying", font=("Segoe UI", 10))
-        studying_label.pack(pady=(10, 0))
+        content = self.build_sidebar("Study Timer")
 
-        task_label = tk.Label(self.root, text=task.title, font=("Segoe UI", 16))
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True)
+
+        centre_frame = tk.Frame(inner, bg=COLOUR_BG)
+        centre_frame.pack(expand=True)
+
+        studying_label = tk.Label(centre_frame, text="Currently studying", font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        studying_label.pack(pady=(0, 2))
+
+        task_label = tk.Label(centre_frame, text=task.title, font=("Segoe UI", 16, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         task_label.pack()
 
-        self.timer_display_label = tk.Label(self.root, text=self.format_time(task.elapsed_seconds), font=("Segoe UI", 36))
+        self.timer_display_label = tk.Label(centre_frame, text=self.format_time(task.elapsed_seconds), font=("Segoe UI", 44, "bold"), bg=COLOUR_BG, fg=COLOUR_ACCENT)
         self.timer_display_label.pack(pady=20)
 
-        target_label = tk.Label(self.root, text=f"Target: {task.duration} minutes")
-        target_label.pack()
+        target_label = tk.Label(centre_frame, text=f"Target: {task.duration} minutes", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        target_label.pack(pady=(0, 16))
 
-        controls_frame = tk.Frame(self.root)
-        controls_frame.pack(pady=10)
+        controls_frame = tk.Frame(centre_frame, bg=COLOUR_BG)
+        controls_frame.pack(pady=(0, 10))
 
-        self.start_button = tk.Button(controls_frame, text="Start", command=self.start_timer)
+        self.start_button = self.build_flat_button(controls_frame, "Start", self.start_timer, accent=True)
         self.start_button.pack(side="left", padx=5)
 
-        self.pause_button = tk.Button(controls_frame, text="Pause", command=self.pause_timer, state="disabled")
+        self.pause_button = self.build_flat_button(controls_frame, "Pause", self.pause_timer)
+        self.pause_button.config(state="disabled")
         self.pause_button.pack(side="left", padx=5)
 
-        reset_sitting_button = tk.Button(controls_frame, text="Reset this sitting", command=self.reset_sitting)
+        reset_sitting_button = self.build_flat_button(controls_frame, "Reset this sitting", self.reset_sitting)
         reset_sitting_button.pack(side="left", padx=5)
 
         if task.elapsed_seconds > 0:
-            reset_all_button = tk.Button(controls_frame, text="Reset all", command=self.reset_all_progress)
+            reset_all_button = self.build_flat_button(controls_frame, "Reset all", self.reset_all_progress)
             reset_all_button.pack(side="left", padx=5)
 
-        action_frame = tk.Frame(self.root)
-        action_frame.pack(pady=10)
+        action_frame = tk.Frame(centre_frame, bg=COLOUR_BG)
+        action_frame.pack()
 
-        continue_later_button = tk.Button(action_frame, text="Continue later", command=self.continue_later)
+        continue_later_button = self.build_flat_button(action_frame, "Continue later", self.continue_later)
         continue_later_button.pack(side="left", padx=5)
 
-        stop_button = tk.Button(action_frame, text="Stop and finish", command=self.stop_timer)
+        stop_button = self.build_flat_button(action_frame, "Stop and finish", self.stop_timer, danger=True)
         stop_button.pack(side="left", padx=5)
 
+    def build_flat_button(self, parent, text, command, accent=False, danger=False):
+        if accent:
+            bg, fg, hover = COLOUR_ACCENT, COLOUR_ACCENT_TEXT, "#25578c"
+        elif danger:
+            bg, fg, hover = COLOUR_URGENT, "#ffffff", "#b8463f"
+        else:
+            bg, fg, hover = "#f0f0f0", COLOUR_TEXT_DARK, "#e0e0e0"
+
+        button = tk.Button(parent, text=text, command=command, bg=bg, fg=fg, activebackground=bg, activeforeground=fg, relief="flat", font=("Segoe UI", 9), padx=10, pady=6, cursor="hand2")
+        button.bind("<Enter>", lambda event: button.config(bg=hover) if button["state"] != "disabled" else None)
+        button.bind("<Leave>", lambda event: button.config(bg=bg) if button["state"] != "disabled" else None)
+        return button
+    
     def format_time(self, total_seconds):
         minutes = total_seconds // 60
         seconds = total_seconds % 60
@@ -749,31 +785,42 @@ class RevisionPlannerApp:
 
         self.clear_screen()
 
-        finished_label = tk.Label(self.root, text="Session finished", font=("Segoe UI", 16))
-        finished_label.pack(pady=10)
+        content = self.build_sidebar("Study Timer")
 
-        task_label = tk.Label(self.root, text=self.timer_task.title)
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True)
+
+        centre_frame = tk.Frame(inner, bg=COLOUR_BG)
+        centre_frame.pack(expand=True)
+
+        finished_label = tk.Label(centre_frame, text="Session finished", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        finished_label.pack(pady=(0, 4))
+
+        task_label = tk.Label(centre_frame, text=self.timer_task.title, font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
         task_label.pack()
 
-        time_label = tk.Label(self.root, text=f"Time studied: {self.format_time(total_seconds)}", font=("Segoe UI", 14))
-        time_label.pack(pady=15)
+        time_label = tk.Label(centre_frame, text=f"Time studied: {self.format_time(total_seconds)}", font=("Segoe UI", 14, "bold"), bg=COLOUR_BG, fg=COLOUR_ACCENT)
+        time_label.pack(pady=18)
 
-        complete_label = tk.Label(self.root, text="Is this task complete?")
-        complete_label.pack()
+        complete_label = tk.Label(centre_frame, text="Is this task complete?", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        complete_label.pack(pady=(0, 6))
 
-        yes_button = tk.Button(self.root, text="Yes, mark complete", command=lambda: self.finish_session(mark_complete=True))
-        yes_button.pack(pady=3)
+        choice_frame = tk.Frame(centre_frame, bg=COLOUR_BG)
+        choice_frame.pack(pady=(0, 16))
 
-        no_button = tk.Button(self.root, text="Not yet", command=lambda: self.finish_session(mark_complete=False))
-        no_button.pack(pady=3)
+        yes_button = self.build_flat_button(choice_frame, "Yes, mark complete", lambda: self.finish_session(mark_complete=True), accent=True)
+        yes_button.pack(side="left", padx=5)
 
-        confidence_label = tk.Label(self.root, text="Update confidence rating (1-5)")
-        confidence_label.pack(pady=(15, 0))
+        no_button = self.build_flat_button(choice_frame, "Not yet", lambda: self.finish_session(mark_complete=False))
+        no_button.pack(side="left", padx=5)
+
+        confidence_label = tk.Label(centre_frame, text="Update confidence rating (1-5)", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        confidence_label.pack(pady=(0, 4))
 
         self.confidence_var = tk.StringVar(value=str(self.timer_task.confidence_rating))
-        confidence_spinbox = ttk.Spinbox(self.root, from_=1, to=5, textvariable=self.confidence_var, width=5, state="readonly")
-        confidence_spinbox.pack(pady=5)
-
+        confidence_spinbox = ttk.Spinbox(centre_frame, from_=1, to=5, textvariable=self.confidence_var, width=5, state="readonly", font=("Segoe UI", 10))
+        confidence_spinbox.pack()
+        
     def finish_session(self, mark_complete):
         new_confidence = int(self.confidence_var.get())
         self.timer_task.confidence_rating = new_confidence

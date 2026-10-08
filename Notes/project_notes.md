@@ -145,3 +145,19 @@ The current denominator rule ("a task counts unless completed strictly before th
 Considered adding a created_date field to Task to filter these out for historical accuracy, but decided against it for now: the denominator is primarily meant to be a meaningful current backlog figure, and past-period viewing is more of a secondary "look back" feature than a strict historical record. Adding this would require another date field and additional filtering logic on top of an already-tested, working system.
 
 Documented as a known limitation rather than fixed.
+
+
+## Dark mode, high contrast and font size: saved but not yet applied
+
+The Settings screen saves theme, font size and high contrast per user, but nothing in the GUI reads those values yet. Every screen currently uses hardcoded light-theme colour constants (COLOUR_BG, COLOUR_ACCENT, etc.), so changing a setting has no visible effect.
+
+This was deliberately deferred. Retrofitting theme switching onto half-styled screens would mean redoing work, so the plan is to style every screen in the base light theme first, then do one dedicated pass for theming.
+
+Plan for that pass:
+- Replace the fixed colour constants with a palette lookup (light, dark, and a high-contrast palette) chosen from the logged-in user's saved settings each time a screen is built.
+- Treat high contrast as an independent setting layered on top of the chosen theme (black, white and yellow, as designed in the mockups), not as a third theme option.
+- Apply font size through one helper rather than hardcoding sizes per widget.
+- Matplotlib charts need palette-aware facecolors, and ttk widgets (Combobox, Spinbox) need a ttk.Style, since they ignore normal bg/fg options.
+- Re-render the current screen when settings are saved so changes show immediately.
+
+Known limitation: messagebox popups (errors, confirmations, reminders) are native OS dialogs and cannot be themed. They will stay in the OS default style whichever theme is chosen.

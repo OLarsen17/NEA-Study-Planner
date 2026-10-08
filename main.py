@@ -1051,22 +1051,28 @@ class RevisionPlannerApp:
         return f"{minutes}m {seconds}s"
 
     def show_statistics_screen(self):
-        self.current_stats_screen = "statistics"
         self.clear_screen()
+        self.current_stats_screen = "statistics"
+
+        content = self.build_sidebar("Statistics")
+
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True, padx=24, pady=18)
 
         if self.current_week_start is None:
             self.current_week_start, _ = self.get_week_range(datetime.now().date())
         if self.current_month_start is None:
             self.current_month_start, _ = self.get_month_range(datetime.now().date())
 
-        label = tk.Label(self.root, text="Statistics", font=("Segoe UI", 16))
-        label.pack(pady=10)
+        label = tk.Label(inner, text="Statistics", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack(anchor="w")
 
-        mode_frame = tk.Frame(self.root)
-        mode_frame.pack(pady=5)
+        mode_frame = tk.Frame(inner, bg=COLOUR_BG)
+        mode_frame.pack(anchor="w", pady=(10, 6))
 
         self.stats_view_var = tk.StringVar(value=self.stats_view_mode)
         view_menu = tk.OptionMenu(mode_frame, self.stats_view_var, "weekly", "monthly", command=lambda choice: self.change_stats_view(choice))
+        view_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
         view_menu.pack()
 
         if self.stats_view_mode == "weekly":
@@ -1081,102 +1087,89 @@ class RevisionPlannerApp:
         stats = self.calculate_statistics(start_date=period_start, end_date=period_end)
         tasks = self.pending_user.tasks
 
-        nav_frame = tk.Frame(self.root)
-        nav_frame.pack(pady=5)
+        nav_frame = tk.Frame(inner, bg=COLOUR_BG)
+        nav_frame.pack(anchor="w", pady=(0, 14))
 
-        prev_button = tk.Button(nav_frame, text="← Previous", command=self.go_to_previous_period)
-        prev_button.pack(side="left", padx=5)
+        prev_button = self.build_flat_button(nav_frame, "← Previous", self.go_to_previous_period)
+        prev_button.pack(side="left", padx=(0, 8))
 
-        period_label = tk.Label(nav_frame, text=period_label_text)
-        period_label.pack(side="left", padx=10)
+        period_label = tk.Label(nav_frame, text=period_label_text, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 10))
+        period_label.pack(side="left", padx=8)
 
-        next_button = tk.Button(nav_frame, text="Next →", command=self.go_to_next_period)
-        next_button.pack(side="left", padx=5)
+        next_button = self.build_flat_button(nav_frame, "Next →", self.go_to_next_period)
+        next_button.pack(side="left", padx=8)
 
-        today_button = tk.Button(nav_frame, text="Today", command=self.go_to_current_period)
-        today_button.pack(side="left", padx=5)
-        summary_frame = tk.Frame(self.root)
-        summary_frame.pack(pady=5)
+        today_button = self.build_flat_button(nav_frame, "Today", self.go_to_current_period)
+        today_button.pack(side="left", padx=8)
 
-        total_time_label = tk.Label(summary_frame, text=f"Total study time: {self.format_time(stats['total_seconds'])}")
-        total_time_label.pack()
+        summary_frame = tk.Frame(inner, bg=COLOUR_BG)
+        summary_frame.pack(anchor="w", pady=(0, 14))
 
-        completed_label = tk.Label(summary_frame, text=f"Tasks completed: {stats['completed_count']} / {stats['total_count']}")
-        completed_label.pack()
+        total_time_label = tk.Label(summary_frame, text=f"Total study time: {self.format_time(stats['total_seconds'])}", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        total_time_label.pack(anchor="w")
 
-        confidence_label = tk.Label(summary_frame, text=f"Average confidence: {stats['average_confidence']} / 5")
-        confidence_label.pack()
+        completed_label = tk.Label(summary_frame, text=f"Tasks completed: {stats['completed_count']} / {stats['total_count']}", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        completed_label.pack(anchor="w")
 
-        charts_frame = tk.Frame(self.root)
-        charts_frame.pack(pady=10)
+        confidence_label = tk.Label(summary_frame, text=f"Average confidence: {stats['average_confidence']} / 5", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        confidence_label.pack(anchor="w")
 
-        bar_frame = tk.Frame(charts_frame)
-        bar_frame.pack(side="left", padx=10)
+        charts_frame = tk.Frame(inner, bg=COLOUR_BG)
+        charts_frame.pack(fill="x", pady=10)
+
+        bar_frame = tk.Frame(charts_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+        bar_frame.pack(side="left", padx=(0, 10), fill="both", expand=True)
 
         subjects = list(set(t.subject for t in tasks) | set(stats['subject_totals'].keys()))
-        minutes = []
-        for subject in subjects:
-            seconds = stats['subject_totals'].get(subject, 0)
-            minutes.append(round(seconds / 60, 1))
-
+        minutes = [round(stats['subject_totals'].get(s, 0) / 60, 1) for s in subjects]
         has_time_data = any(seconds > 0 for seconds in stats['subject_totals'].values())
 
         if subjects and has_time_data:
-            bar_figure = Figure(figsize=(3.5, 3), dpi=80)
+            bar_figure = Figure(figsize=(3.3, 3), dpi=80)
             bar_ax = bar_figure.add_subplot()
-            bars = bar_ax.bar(subjects, minutes)
-            bar_ax.set_title("Time per subject (mins)")
-            bar_ax.tick_params(axis='x', labelrotation=30)
+            bars = bar_ax.bar(subjects, minutes, color=COLOUR_ACCENT)
+            bar_ax.set_title("Time per subject (mins)", fontsize=10)
+            bar_ax.tick_params(axis='x', labelrotation=30, labelsize=7)
 
             max_height = max(minutes) if minutes else 0
-            label_offset = max_height * 0.05
-
             for bar, subject in zip(bars, subjects):
                 seconds = stats['subject_totals'].get(subject, 0)
-                label = self.format_time_readable(seconds)
-                bar_ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + label_offset, label, ha='center', va='bottom', fontsize=8)
+                bar_ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + max_height * 0.05, self.format_time_readable(seconds), ha='center', va='bottom', fontsize=7)
 
             bar_ax.set_ylim(top=max_height * 1.2)
             bar_figure.tight_layout()
-
             bar_canvas = FigureCanvasTkAgg(bar_figure, master=bar_frame)
             bar_canvas.draw()
-            bar_canvas.get_tk_widget().pack()
+            bar_canvas.get_tk_widget().pack(padx=8, pady=8)
         else:
-            no_bar_data_label = tk.Label(bar_frame, text="No study data for this week")
-            no_bar_data_label.pack()
+            tk.Label(bar_frame, text="No study data for this period", bg="#ffffff", fg=COLOUR_TEXT_MUTED).pack(pady=40)
 
-        pie_frame = tk.Frame(charts_frame)
-        pie_frame.pack(side="left", padx=10)
+        pie_frame = tk.Frame(charts_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+        pie_frame.pack(side="left", fill="both", expand=True)
 
         has_completion_data = stats['completed_count'] > 0 or (stats['total_count'] - stats['completed_count']) > 0
 
         if has_completion_data:
-            pie_figure = Figure(figsize=(3.5, 3), dpi=80)
+            pie_figure = Figure(figsize=(3.3, 3), dpi=80)
             pie_ax = pie_figure.add_subplot()
-            pie_ax.pie(
-                [stats['completed_count'], stats['total_count'] - stats['completed_count']],
-                labels=["Completed", "Remaining"],
-                autopct="%1.0f%%"
-            )
-            pie_ax.set_title("Task completion")
-
+            pie_ax.pie([stats['completed_count'], stats['total_count'] - stats['completed_count']], labels=["Completed", "Remaining"], autopct="%1.0f%%", colors=[COLOUR_ACCENT, COLOUR_SOON])
+            pie_ax.set_title("Task completion", fontsize=10)
+            pie_figure.tight_layout()
             pie_canvas = FigureCanvasTkAgg(pie_figure, master=pie_frame)
             pie_canvas.draw()
-            pie_canvas.get_tk_widget().pack()
+            pie_canvas.get_tk_widget().pack(padx=8, pady=8)
         else:
-            no_pie_data_label = tk.Label(pie_frame, text="No task activity for this week")
-            no_pie_data_label.pack()
+            tk.Label(pie_frame, text="No task activity for this period", bg="#ffffff", fg=COLOUR_TEXT_MUTED).pack(pady=40)
 
-        progress_report_button = tk.Button(self.root, text="View progress report →", command=self.show_progress_report_screen)
-        progress_report_button.pack(pady=5)
+        links_frame = tk.Frame(inner, bg=COLOUR_BG)
+        links_frame.pack(anchor="w", pady=(14, 0))
 
-        more_stats_button = tk.Button(self.root, text="More statistics/graphs →", command=self.show_advanced_statistics_screen)
-        more_stats_button.pack(pady=5)
+        progress_report_button = self.build_flat_button(links_frame, "View progress report →", self.show_progress_report_screen)
+        progress_report_button.pack(side="left", padx=(0, 8))
 
-        back_button = tk.Button(self.root, text="Back to Dashboard", command=self.show_dashboard)
-        back_button.pack(pady=10)
-
+        more_stats_button = self.build_flat_button(links_frame, "More statistics/graphs →", self.show_advanced_statistics_screen)
+        more_stats_button.pack(side="left")
+        
     def show_advanced_statistics_screen(self):
         self.current_stats_screen = "advanced"
         self.clear_screen()

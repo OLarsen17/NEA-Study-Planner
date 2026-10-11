@@ -174,35 +174,50 @@ class RevisionPlannerApp:
 
     def show_create_account_screen(self):
         self.clear_screen()
+        centre = self.build_auth_container()
 
-        label = tk.Label(self.root, text="Create Account", font=("Segoe UI", 16))
-        label.pack(pady=10)
+        label = tk.Label(centre, text="Create Account", font=("Segoe UI", 22, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack()
 
-        username_label = tk.Label(self.root, text="Username")
-        username_label.pack()
-        self.new_username_entry = tk.Entry(self.root)
-        self.new_username_entry.pack(pady=5)
+        subtitle_label = tk.Label(centre, text="Set up your revision planner profile", font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        subtitle_label.pack(pady=(4, 18))
 
-        password_label = tk.Label(self.root, text="Password")
-        password_label.pack()
-        self.new_password_entry = tk.Entry(self.root, show="*")
-        self.new_password_entry.pack(pady=5)
+        username_label = tk.Label(centre, text="Username", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        username_label.pack(fill="x")
+        self.new_username_entry = self.build_auth_entry(centre)
+        self.new_username_entry.pack(fill="x", ipady=5, pady=(2, 12))
+        self.new_username_entry.focus_set()
 
-        confirm_label = tk.Label(self.root, text="Confirm Password")
-        confirm_label.pack()
-        self.confirm_password_entry = tk.Entry(self.root, show="*")
-        self.confirm_password_entry.pack(pady=5)
+        password_label = tk.Label(centre, text="Password", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        password_label.pack(fill="x")
+        self.new_password_entry = self.build_auth_entry(centre, show="*")
+        self.new_password_entry.pack(fill="x", ipady=5, pady=(2, 2))
+
+        helper_label = tk.Label(centre, text="Must be at least 8 characters", font=("Segoe UI", 8), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
+        helper_label.pack(fill="x", pady=(0, 10))
+
+        confirm_label = tk.Label(centre, text="Confirm Password", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        confirm_label.pack(fill="x")
+        self.confirm_password_entry = self.build_auth_entry(centre, show="*")
+        self.confirm_password_entry.pack(fill="x", ipady=5, pady=(2, 8))
         self.confirm_password_entry.bind("<Return>", lambda event: self.create_account())
 
         self.show_create_password_var = tk.BooleanVar(value=False)
-        show_create_password_check = tk.Checkbutton(self.root, text="Show password", variable=self.show_create_password_var, command=self.toggle_create_password_visibility)
-        show_create_password_check.pack()
+        show_create_password_check = tk.Checkbutton(centre, text="Show password", variable=self.show_create_password_var, command=self.toggle_create_password_visibility, bg=COLOUR_BG, activebackground=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        show_create_password_check.pack(anchor="w", pady=(0, 14))
 
-        create_button = tk.Button(self.root, text="Create Account", command=self.create_account)
-        create_button.pack(pady=10)
+        create_button = self.build_flat_button(centre, "Create Account", self.create_account, accent=True)
+        create_button.pack(fill="x")
 
-        login_link = tk.Button(self.root, text="Already have an account? Log in", command=self.show_login_screen)
-        login_link.pack(pady=5)
+        link_frame = tk.Frame(centre, bg=COLOUR_BG)
+        link_frame.pack(pady=(14, 0))
+
+        link_text = tk.Label(link_frame, text="Already have an account? ", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        link_text.pack(side="left")
+
+        link = tk.Label(link_frame, text="Log in", font=("Segoe UI", 9, "underline"), bg=COLOUR_BG, fg=COLOUR_ACCENT, cursor="hand2")
+        link.pack(side="left")
+        link.bind("<Button-1>", lambda event: self.show_login_screen())
 
     def toggle_create_password_visibility(self):
         if self.show_create_password_var.get():

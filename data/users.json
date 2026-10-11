@@ -48,12 +48,12 @@
                 "subject": "Biology",
                 "deadline": "22/09/2026",
                 "duration": 30,
-                "confidence_rating": 3,
+                "confidence_rating": 4,
                 "initial_confidence_rating": 2,
-                "completed": false,
+                "completed": true,
                 "reminder_sent": true,
                 "elapsed_seconds": 0,
-                "completed_date": null
+                "completed_date": "2026-10-08"
             },
             {
                 "id": "802ac0b2-7902-47bf-9931-7026c63377b9",
@@ -108,6 +108,15 @@
                 "end_time": "2026-10-04T18:40:25.458786",
                 "duration": 0,
                 "duration_seconds": 5,
+                "task_subject": "Biology"
+            },
+            {
+                "id": "432c9a0c-001f-4f5e-a3f5-2b9730c0b918",
+                "task_id": "2994e523-90d5-4ec7-8929-b1d2c12a45cc",
+                "start_time": "2026-10-08T19:25:22.244541",
+                "end_time": "2026-10-08T19:25:23.244541",
+                "duration": 0,
+                "duration_seconds": 1,
                 "task_subject": "Biology"
             }
         ],

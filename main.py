@@ -1171,8 +1171,13 @@ class RevisionPlannerApp:
         more_stats_button.pack(side="left")
         
     def show_advanced_statistics_screen(self):
-        self.current_stats_screen = "advanced"
         self.clear_screen()
+        self.current_stats_screen = "advanced"
+
+        content = self.build_sidebar("Statistics")
+
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True, padx=24, pady=18)
 
         if self.stats_view_mode == "weekly":
             period_start = self.current_week_start
@@ -1185,34 +1190,34 @@ class RevisionPlannerApp:
 
         advanced_stats = self.calculate_advanced_statistics(period_start, period_end)
 
-        label = tk.Label(self.root, text="More Statistics", font=("Segoe UI", 16))
-        label.pack(pady=10)
+        label = tk.Label(inner, text="More Statistics", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack(anchor="w", pady=(0, 10))
 
-        period_label = tk.Label(self.root, text=period_label_text)
-        period_label.pack(pady=5)
+        nav_frame = tk.Frame(inner, bg=COLOUR_BG)
+        nav_frame.pack(anchor="w", pady=(0, 12))
 
-        nav_frame = tk.Frame(self.root)
-        nav_frame.pack(pady=5)
+        prev_button = self.build_flat_button(nav_frame, "← Previous", self.go_to_previous_period)
+        prev_button.pack(side="left", padx=(0, 8))
 
-        prev_button = tk.Button(nav_frame, text="← Previous", command=self.go_to_previous_period)
-        prev_button.pack(side="left", padx=5)
+        period_label = tk.Label(nav_frame, text=period_label_text, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 10))
+        period_label.pack(side="left", padx=8)
 
-        next_button = tk.Button(nav_frame, text="Next →", command=self.go_to_next_period)
-        next_button.pack(side="left", padx=5)
+        next_button = self.build_flat_button(nav_frame, "Next →", self.go_to_next_period)
+        next_button.pack(side="left", padx=8)
 
-        today_button = tk.Button(nav_frame, text="Today", command=self.go_to_current_period)
-        today_button.pack(side="left", padx=5)
+        today_button = self.build_flat_button(nav_frame, "Today", self.go_to_current_period)
+        today_button.pack(side="left", padx=8)
 
-        charts_frame = tk.Frame(self.root)
-        charts_frame.pack(pady=10)
+        charts_frame = tk.Frame(inner, bg=COLOUR_BG)
+        charts_frame.pack(fill="x")
 
-        time_frame = tk.Frame(charts_frame)
-        time_frame.pack(side="left", padx=10)
+        time_frame = tk.Frame(charts_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+        time_frame.pack(side="left", padx=(0, 10), fill="both", expand=True)
 
         time_data = advanced_stats["time_vs_estimate"]
 
         if time_data:
-            time_figure = Figure(figsize=(4, 3), dpi=80)
+            time_figure = Figure(figsize=(3.4, 3), dpi=80)
             time_ax = time_figure.add_subplot()
 
             titles = [t["title"] for t in time_data]
@@ -1222,28 +1227,27 @@ class RevisionPlannerApp:
             x_positions = range(len(titles))
             bar_width = 0.35
 
-            time_ax.bar([x - bar_width/2 for x in x_positions], estimated, bar_width, label="Estimated")
-            time_ax.bar([x + bar_width/2 for x in x_positions], actual, bar_width, label="Actual")
+            time_ax.bar([x - bar_width / 2 for x in x_positions], estimated, bar_width, label="Estimated", color="#a9bdd3")
+            time_ax.bar([x + bar_width / 2 for x in x_positions], actual, bar_width, label="Actual", color=COLOUR_ACCENT)
             time_ax.set_xticks(list(x_positions))
             time_ax.set_xticklabels(titles, rotation=30, ha="right", fontsize=7)
-            time_ax.set_title("Estimated vs Actual Time (mins)")
+            time_ax.set_title("Estimated vs Actual Time (mins)", fontsize=10)
             time_ax.legend(fontsize=7)
             time_figure.tight_layout()
 
             time_canvas = FigureCanvasTkAgg(time_figure, master=time_frame)
             time_canvas.draw()
-            time_canvas.get_tk_widget().pack()
+            time_canvas.get_tk_widget().pack(padx=8, pady=8)
         else:
-            no_time_label = tk.Label(time_frame, text="No studied tasks this period")
-            no_time_label.pack()
+            tk.Label(time_frame, text="No studied tasks this period", bg="#ffffff", fg=COLOUR_TEXT_MUTED).pack(pady=40)
 
-        confidence_frame = tk.Frame(charts_frame)
-        confidence_frame.pack(side="left", padx=10)
+        confidence_frame = tk.Frame(charts_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+        confidence_frame.pack(side="left", fill="both", expand=True)
 
         confidence_data = advanced_stats["confidence_changes"]
 
         if confidence_data:
-            confidence_figure = Figure(figsize=(4, 3), dpi=80)
+            confidence_figure = Figure(figsize=(3.4, 3), dpi=80)
             confidence_ax = confidence_figure.add_subplot()
 
             titles = [c["title"] for c in confidence_data]
@@ -1253,24 +1257,23 @@ class RevisionPlannerApp:
             x_positions = range(len(titles))
             bar_width = 0.35
 
-            confidence_ax.bar([x - bar_width/2 for x in x_positions], initial, bar_width, label="Before")
-            confidence_ax.bar([x + bar_width/2 for x in x_positions], final, bar_width, label="After")
+            confidence_ax.bar([x - bar_width / 2 for x in x_positions], initial, bar_width, label="Before", color="#a9bdd3")
+            confidence_ax.bar([x + bar_width / 2 for x in x_positions], final, bar_width, label="After", color=COLOUR_ACCENT)
             confidence_ax.set_xticks(list(x_positions))
             confidence_ax.set_xticklabels(titles, rotation=30, ha="right", fontsize=7)
-            confidence_ax.set_title("Confidence Change")
+            confidence_ax.set_title("Confidence Change", fontsize=10)
             confidence_ax.set_ylim(0, 5.5)
             confidence_ax.legend(fontsize=7)
             confidence_figure.tight_layout()
 
             confidence_canvas = FigureCanvasTkAgg(confidence_figure, master=confidence_frame)
             confidence_canvas.draw()
-            confidence_canvas.get_tk_widget().pack()
+            confidence_canvas.get_tk_widget().pack(padx=8, pady=8)
         else:
-            no_confidence_label = tk.Label(confidence_frame, text="No confidence changes this period")
-            no_confidence_label.pack()
+            tk.Label(confidence_frame, text="No confidence changes this period", bg="#ffffff", fg=COLOUR_TEXT_MUTED).pack(pady=40)
 
-        back_button = tk.Button(self.root, text="Back to Statistics", command=self.show_statistics_screen)
-        back_button.pack(pady=10)
+        back_button = self.build_flat_button(inner, "Back to Statistics", self.show_statistics_screen)
+        back_button.pack(anchor="w", pady=(16, 0))
 
     def change_stats_view(self, choice):
         self.stats_view_mode = choice
@@ -1336,47 +1339,51 @@ class RevisionPlannerApp:
             self.show_statistics_screen()
 
     def show_progress_report_screen(self):
-        self.current_stats_screen = "progress_report"
         self.clear_screen()
+        self.current_stats_screen = "progress_report"
+
+        content = self.build_sidebar("Statistics")
+
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True, padx=24, pady=18)
 
         if self.stats_view_mode == "weekly":
             period_start = self.current_week_start
             period_end = period_start + timedelta(days=6)
+            period_text = f"the week of {period_start.strftime('%d %b')} – {period_end.strftime('%d %b %Y')}"
         else:
             period_start = self.current_month_start
             _, period_end = self.get_month_range(period_start)
-
-        stats = self.calculate_statistics(start_date=period_start, end_date=period_end)
-        
-        label = tk.Label(self.root, text="Progress Report", font=("Segoe UI", 16))
-        label.pack(pady=10)
-
-        if self.stats_view_mode == "weekly":
-            period_text = f"the week of {period_start.strftime('%d %b')} – {period_end.strftime('%d %b %Y')}"
-        else:
             period_text = period_start.strftime('%B %Y')
 
-        nav_frame = tk.Frame(self.root)
-        nav_frame.pack(pady=5)
+        stats = self.calculate_statistics(start_date=period_start, end_date=period_end)
 
-        prev_button = tk.Button(nav_frame, text="← Previous", command=self.go_to_previous_period)
-        prev_button.pack(side="left", padx=5)
+        label = tk.Label(inner, text="Progress Report", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack(anchor="w", pady=(0, 10))
 
-        next_button = tk.Button(nav_frame, text="Next →", command=self.go_to_next_period)
-        next_button.pack(side="left", padx=5)
+        nav_frame = tk.Frame(inner, bg=COLOUR_BG)
+        nav_frame.pack(anchor="w", pady=(0, 12))
 
-        today_button = tk.Button(nav_frame, text="Today", command=self.go_to_current_period)
-        today_button.pack(side="left", padx=5)
+        prev_button = self.build_flat_button(nav_frame, "← Previous", self.go_to_previous_period)
+        prev_button.pack(side="left", padx=(0, 8))
 
-        summary_text = f"For {period_text}, you completed {stats['completed_count']} of {stats['total_count']} tasks and studied for {self.format_time_readable(stats['total_seconds'])}."        
-        summary_label = tk.Label(self.root, text=summary_text, wraplength=400)
-        summary_label.pack(pady=5)
+        next_button = self.build_flat_button(nav_frame, "Next →", self.go_to_next_period)
+        next_button.pack(side="left", padx=8)
 
-        feedback_label = tk.Label(self.root, text="Subject Feedback", font=("Segoe UI", 12))
-        feedback_label.pack(pady=(15, 5))
+        today_button = self.build_flat_button(nav_frame, "Today", self.go_to_current_period)
+        today_button.pack(side="left", padx=8)
 
-        feedback_frame = tk.Frame(self.root)
-        feedback_frame.pack(pady=5)
+        summary_text = f"For {period_text}, you completed {stats['completed_count']} of {stats['total_count']} tasks and studied for {self.format_time_readable(stats['total_seconds'])}."
+        summary_label = tk.Label(inner, text=summary_text, wraplength=520, justify="left", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 10), anchor="w")
+        summary_label.pack(fill="x", pady=(0, 16))
+
+        feedback_label = tk.Label(inner, text="SUBJECT FEEDBACK", font=("Segoe UI", 9, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
+        feedback_label.pack(fill="x", pady=(0, 6))
+
+        feedback_frame = tk.Frame(inner, bg=COLOUR_BG)
+        feedback_frame.pack(fill="x")
+
+        period_word = "this week" if self.stats_view_mode == "weekly" else "this month"
 
         for subject, completion in stats['subject_completion'].items():
             completed = completion["completed"]
@@ -1385,25 +1392,38 @@ class RevisionPlannerApp:
             if total == 0:
                 continue
 
-            time_spent = stats['subject_totals'].get(subject, 0)
-            has_time_spent = time_spent > 0
-
-            period_word = "this week" if self.stats_view_mode == "weekly" else "this month"
+            has_time_spent = stats['subject_totals'].get(subject, 0) > 0
 
             if completed == total:
-                feedback_text = f"{subject}: You're doing great, fully up to date!"
+                feedback_text = "You're doing great, fully up to date!"
+                strip_colour = COLOUR_ACCENT
             elif completed > 0 and has_time_spent:
-                feedback_text = f"{subject}: You're making progress, keep it up."
+                feedback_text = "You're making progress, keep it up."
+                strip_colour = COLOUR_ACCENT
             elif completed == 0 and has_time_spent:
-                feedback_text = f"{subject}: You've been working on this but haven't finished a task yet."
+                feedback_text = "You've been working on this but haven't finished a task yet."
+                strip_colour = COLOUR_SOON
             else:
-                feedback_text = f"{subject}: You haven't studied this yet {period_word}, consider giving it some attention."
-                
-            subject_row = tk.Label(feedback_frame, text=feedback_text, wraplength=400, justify="left", anchor="w")
-            subject_row.pack(fill="x", pady=2)
+                feedback_text = f"You haven't studied this yet {period_word}, consider giving it some attention."
+                strip_colour = COLOUR_URGENT
 
-        back_button = tk.Button(self.root, text="Back to Statistics", command=self.show_statistics_screen)
-        back_button.pack(pady=10) 
+            card = tk.Frame(feedback_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+            card.pack(fill="x", pady=3)
+
+            strip = tk.Frame(card, bg=strip_colour, width=5)
+            strip.pack(side="left", fill="y")
+
+            text_frame = tk.Frame(card, bg="#ffffff")
+            text_frame.pack(side="left", fill="x", expand=True, padx=10, pady=8)
+
+            subject_label = tk.Label(text_frame, text=subject, font=("Segoe UI", 10, "bold"), bg="#ffffff", fg=COLOUR_TEXT_DARK, anchor="w")
+            subject_label.pack(fill="x")
+
+            message_label = tk.Label(text_frame, text=feedback_text, font=("Segoe UI", 9), bg="#ffffff", fg=COLOUR_TEXT_MUTED, anchor="w", wraplength=480, justify="left")
+            message_label.pack(fill="x")
+
+        back_button = self.build_flat_button(inner, "Back to Statistics", self.show_statistics_screen)
+        back_button.pack(anchor="w", pady=(16, 0))
 
     def get_month_range(self, reference_date):
         month_start = reference_date.replace(day=1)

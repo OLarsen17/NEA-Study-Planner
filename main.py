@@ -45,39 +45,97 @@ class RevisionPlannerApp:
 
     #-----LOGIN-----#
 
+    def build_auth_container(self):
+        self.root.configure(bg=COLOUR_BG)
+
+        container = tk.Frame(self.root, bg=COLOUR_BG)
+        container.pack(fill="both", expand=True)
+
+        centre_frame = tk.Frame(container, bg=COLOUR_BG)
+        centre_frame.place(relx=0.5, rely=0.45, anchor="center")
+
+        return centre_frame
+
+    def build_auth_entry(self, parent, show=None):
+        return tk.Entry(parent, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightcolor=COLOUR_ACCENT, highlightthickness=1, font=("Segoe UI", 11), width=30, show=show or "")
+
     def show_welcome_screen(self):
         self.clear_screen()
+        centre = self.build_auth_container()
 
-        title_label = tk.Label(self.root, text="Revision Planner", font=("Segoe UI", 20))
-        title_label.pack(pady=20) #spacing
+        title_label = tk.Label(centre, text="Revision Planner", font=("Segoe UI", 28, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        title_label.pack()
 
-        subtitle_label = tk.Label(self.root, text="Study Smarter")
-        subtitle_label.pack(pady=5)
+        subtitle_label = tk.Label(centre, text="Study Smarter", font=("Segoe UI", 12), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        subtitle_label.pack(pady=(4, 32))
 
-        login_button = tk.Button(self.root, text="Login", command=self.show_login_screen)
-        login_button.pack(pady=10)
+        login_button = self.build_flat_button(centre, "Login", self.show_login_screen, accent=True)
+        login_button.config(width=28, font=("Segoe UI", 11), pady=8)
+        login_button.pack(pady=(0, 12))
 
-        create_account_button = tk.Button(self.root, text="Create Account", command=self.show_create_account_screen)
-        create_account_button.pack(pady=5)
+        create_account_button = self.build_flat_button(centre, "Create Account", self.show_create_account_screen)
+        create_account_button.config(width=28, font=("Segoe UI", 11), pady=8)
+        create_account_button.pack()
 
     def show_login_screen(self):
         self.clear_screen()
+        centre = self.build_auth_container()
 
-        label = tk.Label(self.root, text="Login", font=("Segoe UI", 16))
-        label.pack(pady=10)
+        label = tk.Label(centre, text="Login", font=("Segoe UI", 22, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack()
 
-        username_label = tk.Label(self.root, text="Username")
-        username_label.pack()
+        subtitle_label = tk.Label(centre, text="Enter your username to continue", font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        subtitle_label.pack(pady=(4, 24))
 
-        self.username_entry = tk.Entry(self.root) #reads whatever user entered
-        self.username_entry.pack(pady=5)
+        username_label = tk.Label(centre, text="Username", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        username_label.pack(fill="x")
+
+        self.username_entry = self.build_auth_entry(centre)
+        self.username_entry.pack(fill="x", ipady=5, pady=(2, 16))
         self.username_entry.bind("<Return>", lambda event: self.check_username())
+        self.username_entry.focus_set()
 
-        continue_button = tk.Button(self.root, text="Continue", command=self.check_username)
-        continue_button.pack(pady=10)
+        continue_button = self.build_flat_button(centre, "Continue", self.check_username, accent=True)
+        continue_button.pack(fill="x")
 
-        create_account_link = tk.Button(self.root, text="Don't have an account? Create one", command=self.show_create_account_screen)
-        create_account_link.pack(pady=5)
+        link_frame = tk.Frame(centre, bg=COLOUR_BG)
+        link_frame.pack(pady=(16, 0))
+
+        link_text = tk.Label(link_frame, text="Don't have an account? ", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        link_text.pack(side="left")
+
+        link = tk.Label(link_frame, text="Create one", font=("Segoe UI", 9, "underline"), bg=COLOUR_BG, fg=COLOUR_ACCENT, cursor="hand2")
+        link.pack(side="left")
+        link.bind("<Button-1>", lambda event: self.show_create_account_screen())
+
+    def show_password_screen(self):
+        self.clear_screen()
+        centre = self.build_auth_container()
+
+        label = tk.Label(centre, text=f"Welcome back, {self.pending_user.username}", font=("Segoe UI", 22, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack()
+
+        subtitle_label = tk.Label(centre, text="Enter your password to log in", font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        subtitle_label.pack(pady=(4, 24))
+
+        password_label = tk.Label(centre, text="Password", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        password_label.pack(fill="x")
+
+        self.password_entry = self.build_auth_entry(centre, show="*")
+        self.password_entry.pack(fill="x", ipady=5, pady=(2, 8))
+        self.password_entry.bind("<Return>", lambda event: self.check_password())
+        self.password_entry.focus_set()
+
+        self.show_password_var = tk.BooleanVar(value=False)
+        show_password_check = tk.Checkbutton(centre, text="Show password", variable=self.show_password_var, command=self.toggle_password_visibility, bg=COLOUR_BG, activebackground=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        show_password_check.pack(anchor="w", pady=(0, 16))
+
+        continue_button = self.build_flat_button(centre, "Continue", self.check_password, accent=True)
+        continue_button.pack(fill="x")
+
+        back_link = tk.Label(centre, text="← Back", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, cursor="hand2")
+        back_link.pack(pady=(16, 0))
+        back_link.bind("<Button-1>", lambda event: self.show_login_screen())
 
     def check_username(self):
         entered_username = self.username_entry.get()
@@ -99,26 +157,6 @@ class RevisionPlannerApp:
 
         self.pending_user = matched_user
         self.show_password_screen()
-
-    def show_password_screen(self):
-        self.clear_screen()
-
-        label = tk.Label(self.root, text=f"Welcome back, {self.pending_user.username}", font=("Segoe UI", 16))
-        label.pack(pady=10)
-
-        password_label = tk.Label(self.root, text="Password")
-        password_label.pack()
-
-        self.password_entry = tk.Entry(self.root, show="*") #make sure password is not shown and shows * instead
-        self.password_entry.pack(pady=5)
-        self.password_entry.bind("<Return>", lambda event: self.check_password())
-
-        self.show_password_var = tk.BooleanVar(value=False)
-        show_password_check = tk.Checkbutton(self.root, text="Show password", variable=self.show_password_var, command=self.toggle_password_visibility)
-        show_password_check.pack()
-
-        continue_button = tk.Button(self.root, text="Continue", command=self.check_password)
-        continue_button.pack(pady=10)
 
     def toggle_password_visibility(self):
         if self.show_password_var.get():

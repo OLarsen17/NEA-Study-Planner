@@ -49,6 +49,23 @@ PALETTES = {
         "SOON": "#b8860b",
         "LATER": "#4a86c8",
     },
+    "high_contrast": {
+        "BG": "#000000",
+        "SIDEBAR": "#1a1a1a",
+        "SIDEBAR_HOVER": "#333333",
+        "ACCENT": "#ffff00",
+        "ACCENT_HOVER": "#ffffff",
+        "ACCENT_TEXT": "#000000",
+        "TEXT_DARK": "#ffffff",
+        "TEXT_MUTED": "#ffff00",
+        "CARD": "#000000",
+        "CARD_BORDER": "#ffffff",
+        "NEUTRAL": "#333333",
+        "NEUTRAL_HOVER": "#555555",
+        "URGENT": "#d40000",
+        "SOON": "#a85a00",
+        "LATER": "#0050c8",
+    },
 }
 
 FONT_SCALE = 1.0
@@ -70,10 +87,17 @@ COLOUR_SOON = PALETTES["light"]["SOON"]
 COLOUR_LATER = PALETTES["light"]["LATER"]
 
 
-def apply_theme(theme_name="light"):
-    palette = PALETTES.get(theme_name, PALETTES["light"])
-    globals().update({"COLOUR_" + key: value for key, value in palette.items()})
+FONT_SCALES = {"small": 0.85, "medium": 1.0, "large": 1.25}
 
+
+def apply_theme(theme_name="light", high_contrast=False, font_size="medium"):
+    global FONT_SCALE
+    if high_contrast:
+        palette = PALETTES["high_contrast"]
+    else:
+        palette = PALETTES.get(theme_name, PALETTES["light"])
+    globals().update({"COLOUR_" + key: value for key, value in palette.items()})
+    FONT_SCALE = FONT_SCALES.get(font_size, 1.0)
 
 def F(size, *style):
     return ("Segoe UI", round(size * FONT_SCALE), *style)
@@ -118,11 +142,33 @@ class RevisionPlannerApp:
 
     def apply_user_theme(self):
         settings = self.pending_user.settings
-        apply_theme(settings.theme)
+        apply_theme(settings.theme, settings.high_contrast, settings.font_size)
+        self.style_ttk_widgets()
+
+    def apply_default_theme(self):
+        apply_theme()
+        self.style_ttk_widgets()
+
+    def style_ttk_widgets(self):
+        style = ttk.Style()
+        style.theme_use("clam")
+        for widget in ("TCombobox", "TSpinbox"):
+            style.configure(widget, fieldbackground=COLOUR_CARD, background=COLOUR_CARD, foreground=COLOUR_TEXT_DARK, arrowcolor=COLOUR_TEXT_DARK, bordercolor=COLOUR_CARD_BORDER, lightcolor=COLOUR_CARD, darkcolor=COLOUR_CARD)
+            style.map(widget, fieldbackground=[("readonly", COLOUR_CARD)], foreground=[("readonly", COLOUR_TEXT_DARK)])
+        self.root.option_add("*TCombobox*Listbox.background", COLOUR_CARD)
+        self.root.option_add("*TCombobox*Listbox.foreground", COLOUR_TEXT_DARK)
+
+    def style_chart(self, figure, ax):
+        figure.patch.set_facecolor(COLOUR_CARD)
+        ax.set_facecolor(COLOUR_CARD)
+        ax.tick_params(colors=COLOUR_TEXT_DARK)
+        ax.title.set_color(COLOUR_TEXT_DARK)
+        for spine in ax.spines.values():
+            spine.set_color(COLOUR_TEXT_MUTED)
 
     def show_welcome_screen(self):
         self.clear_screen()
-        apply_theme()
+        self.apply_default_theme()
         centre = self.build_auth_container()
 
         title_label = tk.Label(centre, text="Revision Planner", font=F(28, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
@@ -1252,9 +1298,10 @@ class RevisionPlannerApp:
             max_height = max(minutes) if minutes else 0
             for bar, subject in zip(bars, subjects):
                 seconds = stats['subject_totals'].get(subject, 0)
-                bar_ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + max_height * 0.05, self.format_time_readable(seconds), ha='center', va='bottom', fontsize=7)
+                bar_ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + max_height * 0.05, self.format_time_readable(seconds), ha='center', va='bottom', fontsize=7, color=COLOUR_TEXT_DARK)
 
             bar_ax.set_ylim(top=max_height * 1.2)
+            self.style_chart(bar_figure, bar_ax)
             bar_figure.tight_layout()
             bar_canvas = FigureCanvasTkAgg(bar_figure, master=bar_frame)
             bar_canvas.draw()
@@ -1270,8 +1317,11 @@ class RevisionPlannerApp:
         if has_completion_data:
             pie_figure = Figure(figsize=(3.3, 3), dpi=80)
             pie_ax = pie_figure.add_subplot()
-            pie_ax.pie([stats['completed_count'], stats['total_count'] - stats['completed_count']], labels=["Completed", "Remaining"], autopct="%1.0f%%", colors=[COLOUR_ACCENT, COLOUR_SOON])
+            wedges, texts, autotexts = pie_ax.pie([stats['completed_count'], stats['total_count'] - stats['completed_count']], labels=["Completed", "Remaining"], autopct="%1.0f%%", colors=[COLOUR_ACCENT, COLOUR_SOON])
             pie_ax.set_title("Task completion", fontsize=10)
+            for text in texts:
+                text.set_color(COLOUR_TEXT_DARK)
+            self.style_chart(pie_figure, pie_ax)
             pie_figure.tight_layout()
             pie_canvas = FigureCanvasTkAgg(pie_figure, master=pie_frame)
             pie_canvas.draw()
@@ -1350,7 +1400,8 @@ class RevisionPlannerApp:
             time_ax.set_xticks(list(x_positions))
             time_ax.set_xticklabels(titles, rotation=30, ha="right", fontsize=7)
             time_ax.set_title("Estimated vs Actual Time (mins)", fontsize=10)
-            time_ax.legend(fontsize=7)
+            time_ax.legend(fontsize=7, facecolor=COLOUR_CARD, edgecolor=COLOUR_CARD_BORDER, labelcolor=COLOUR_TEXT_DARK)
+            self.style_chart(time_figure, time_ax)
             time_figure.tight_layout()
 
             time_canvas = FigureCanvasTkAgg(time_figure, master=time_frame)
@@ -1381,7 +1432,8 @@ class RevisionPlannerApp:
             confidence_ax.set_xticklabels(titles, rotation=30, ha="right", fontsize=7)
             confidence_ax.set_title("Confidence Change", fontsize=10)
             confidence_ax.set_ylim(0, 5.5)
-            confidence_ax.legend(fontsize=7)
+            confidence_ax.legend(fontsize=7, facecolor=COLOUR_CARD, edgecolor=COLOUR_CARD_BORDER, labelcolor=COLOUR_TEXT_DARK)
+            self.style_chart(confidence_figure, confidence_ax)           
             confidence_figure.tight_layout()
 
             confidence_canvas = FigureCanvasTkAgg(confidence_figure, master=confidence_frame)

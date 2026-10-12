@@ -13,17 +13,70 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 
-# ----- THEME CONSTANTS -----
-COLOUR_BG = "#f3f6fa"
-COLOUR_SIDEBAR = "#e8eef5"
-COLOUR_ACCENT = "#2f6fb0"
-COLOUR_ACCENT_TEXT = "#ffffff"
-COLOUR_TEXT_DARK = "#16324f"
-COLOUR_TEXT_MUTED = "#5a6b7d"
-COLOUR_CARD_BORDER = "#d4dae2"
-COLOUR_URGENT = "#d9534f"
-COLOUR_SOON = "#e0a52f"
-COLOUR_LATER = "#2f6fb0"
+# ----- THEME PALETTES -----
+PALETTES = {
+    "light": {
+        "BG": "#f3f6fa",
+        "SIDEBAR": "#e8eef5",
+        "SIDEBAR_HOVER": "#dce6f0",
+        "ACCENT": "#2f6fb0",
+        "ACCENT_HOVER": "#25578c",
+        "ACCENT_TEXT": "#ffffff",
+        "TEXT_DARK": "#16324f",
+        "TEXT_MUTED": "#5a6b7d",
+        "CARD": "#ffffff",
+        "CARD_BORDER": "#d4dae2",
+        "NEUTRAL": "#f0f0f0",
+        "NEUTRAL_HOVER": "#e0e0e0",
+        "URGENT": "#d9534f",
+        "SOON": "#e0a52f",
+        "LATER": "#2f6fb0",
+    },
+    "dark": {
+        "BG": "#1e2530",
+        "SIDEBAR": "#151a22",
+        "SIDEBAR_HOVER": "#232c3a",
+        "ACCENT": "#4a86c8",
+        "ACCENT_HOVER": "#5a96d8",
+        "ACCENT_TEXT": "#ffffff",
+        "TEXT_DARK": "#e6ebf2",
+        "TEXT_MUTED": "#9aa7b8",
+        "CARD": "#2a3242",
+        "CARD_BORDER": "#3d4759",
+        "NEUTRAL": "#3a4558",
+        "NEUTRAL_HOVER": "#46526a",
+        "URGENT": "#c4314b",
+        "SOON": "#b8860b",
+        "LATER": "#4a86c8",
+    },
+}
+
+FONT_SCALE = 1.0
+
+COLOUR_BG = PALETTES["light"]["BG"]
+COLOUR_SIDEBAR = PALETTES["light"]["SIDEBAR"]
+COLOUR_SIDEBAR_HOVER = PALETTES["light"]["SIDEBAR_HOVER"]
+COLOUR_ACCENT = PALETTES["light"]["ACCENT"]
+COLOUR_ACCENT_HOVER = PALETTES["light"]["ACCENT_HOVER"]
+COLOUR_ACCENT_TEXT = PALETTES["light"]["ACCENT_TEXT"]
+COLOUR_TEXT_DARK = PALETTES["light"]["TEXT_DARK"]
+COLOUR_TEXT_MUTED = PALETTES["light"]["TEXT_MUTED"]
+COLOUR_CARD = PALETTES["light"]["CARD"]
+COLOUR_CARD_BORDER = PALETTES["light"]["CARD_BORDER"]
+COLOUR_NEUTRAL = PALETTES["light"]["NEUTRAL"]
+COLOUR_NEUTRAL_HOVER = PALETTES["light"]["NEUTRAL_HOVER"]
+COLOUR_URGENT = PALETTES["light"]["URGENT"]
+COLOUR_SOON = PALETTES["light"]["SOON"]
+COLOUR_LATER = PALETTES["light"]["LATER"]
+
+
+def apply_theme(theme_name="light"):
+    palette = PALETTES.get(theme_name, PALETTES["light"])
+    globals().update({"COLOUR_" + key: value for key, value in palette.items()})
+
+
+def F(size, *style):
+    return ("Segoe UI", round(size * FONT_SCALE), *style)
 
 
 
@@ -57,37 +110,46 @@ class RevisionPlannerApp:
         return centre_frame
 
     def build_auth_entry(self, parent, show=None):
-        return tk.Entry(parent, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightcolor=COLOUR_ACCENT, highlightthickness=1, font=("Segoe UI", 11), width=30, show=show or "")
+        return tk.Entry(parent, relief="flat", bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, insertbackground=COLOUR_TEXT_DARK, highlightbackground=COLOUR_CARD_BORDER, highlightcolor=COLOUR_ACCENT, highlightthickness=1, font=F(11), width=30, show=show or "")
+
+    def style_option_menu(self, menu):
+        menu.config(bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, activebackground=COLOUR_SIDEBAR_HOVER, activeforeground=COLOUR_TEXT_DARK, relief="flat", font=F(9), highlightthickness=0)
+        menu["menu"].config(bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, font=F(9))
+
+    def apply_user_theme(self):
+        settings = self.pending_user.settings
+        apply_theme(settings.theme)
 
     def show_welcome_screen(self):
         self.clear_screen()
+        apply_theme()
         centre = self.build_auth_container()
 
-        title_label = tk.Label(centre, text="Revision Planner", font=("Segoe UI", 28, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        title_label = tk.Label(centre, text="Revision Planner", font=F(28, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         title_label.pack()
 
-        subtitle_label = tk.Label(centre, text="Study Smarter", font=("Segoe UI", 12), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        subtitle_label = tk.Label(centre, text="Study Smarter", font=F(12), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
         subtitle_label.pack(pady=(4, 32))
 
         login_button = self.build_flat_button(centre, "Login", self.show_login_screen, accent=True)
-        login_button.config(width=28, font=("Segoe UI", 11), pady=8)
+        login_button.config(width=28, font=F(11), pady=8)
         login_button.pack(pady=(0, 12))
 
         create_account_button = self.build_flat_button(centre, "Create Account", self.show_create_account_screen)
-        create_account_button.config(width=28, font=("Segoe UI", 11), pady=8)
+        create_account_button.config(width=28, font=F(11), pady=8)
         create_account_button.pack()
 
     def show_login_screen(self):
         self.clear_screen()
         centre = self.build_auth_container()
 
-        label = tk.Label(centre, text="Login", font=("Segoe UI", 22, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label = tk.Label(centre, text="Login", font=F(22, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         label.pack()
 
-        subtitle_label = tk.Label(centre, text="Enter your username to continue", font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        subtitle_label = tk.Label(centre, text="Enter your username to continue", font=F(10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
         subtitle_label.pack(pady=(4, 24))
 
-        username_label = tk.Label(centre, text="Username", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        username_label = tk.Label(centre, text="Username", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         username_label.pack(fill="x")
 
         self.username_entry = self.build_auth_entry(centre)
@@ -101,10 +163,10 @@ class RevisionPlannerApp:
         link_frame = tk.Frame(centre, bg=COLOUR_BG)
         link_frame.pack(pady=(16, 0))
 
-        link_text = tk.Label(link_frame, text="Don't have an account? ", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        link_text = tk.Label(link_frame, text="Don't have an account? ", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
         link_text.pack(side="left")
 
-        link = tk.Label(link_frame, text="Create one", font=("Segoe UI", 9, "underline"), bg=COLOUR_BG, fg=COLOUR_ACCENT, cursor="hand2")
+        link = tk.Label(link_frame, text="Create one", font=F(9, "underline"), bg=COLOUR_BG, fg=COLOUR_ACCENT, cursor="hand2")
         link.pack(side="left")
         link.bind("<Button-1>", lambda event: self.show_create_account_screen())
 
@@ -112,13 +174,13 @@ class RevisionPlannerApp:
         self.clear_screen()
         centre = self.build_auth_container()
 
-        label = tk.Label(centre, text=f"Welcome back, {self.pending_user.username}", font=("Segoe UI", 22, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label = tk.Label(centre, text=f"Welcome back, {self.pending_user.username}", font=F(22, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         label.pack()
 
-        subtitle_label = tk.Label(centre, text="Enter your password to log in", font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        subtitle_label = tk.Label(centre, text="Enter your password to log in", font=F(10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
         subtitle_label.pack(pady=(4, 24))
 
-        password_label = tk.Label(centre, text="Password", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        password_label = tk.Label(centre, text="Password", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         password_label.pack(fill="x")
 
         self.password_entry = self.build_auth_entry(centre, show="*")
@@ -127,13 +189,13 @@ class RevisionPlannerApp:
         self.password_entry.focus_set()
 
         self.show_password_var = tk.BooleanVar(value=False)
-        show_password_check = tk.Checkbutton(centre, text="Show password", variable=self.show_password_var, command=self.toggle_password_visibility, bg=COLOUR_BG, activebackground=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        show_password_check = tk.Checkbutton(centre, text="Show password", variable=self.show_password_var, command=self.toggle_password_visibility, bg=COLOUR_BG, activebackground=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         show_password_check.pack(anchor="w", pady=(0, 16))
 
         continue_button = self.build_flat_button(centre, "Continue", self.check_password, accent=True)
         continue_button.pack(fill="x")
 
-        back_link = tk.Label(centre, text="← Back", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, cursor="hand2")
+        back_link = tk.Label(centre, text="← Back", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, cursor="hand2")
         back_link.pack(pady=(16, 0))
         back_link.bind("<Button-1>", lambda event: self.show_login_screen())
 
@@ -165,9 +227,11 @@ class RevisionPlannerApp:
             self.password_entry.config(show="*")
 
     def check_password(self):
+
         entered_password = self.password_entry.get()
 
         if entered_password == self.pending_user.password:
+            self.apply_user_theme()
             self.show_dashboard()
         else:
             messagebox.showerror("Login Error", "That password isn't right. Please try again.")
@@ -176,34 +240,34 @@ class RevisionPlannerApp:
         self.clear_screen()
         centre = self.build_auth_container()
 
-        label = tk.Label(centre, text="Create Account", font=("Segoe UI", 22, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label = tk.Label(centre, text="Create Account", font=F(22, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         label.pack()
 
-        subtitle_label = tk.Label(centre, text="Set up your revision planner profile", font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        subtitle_label = tk.Label(centre, text="Set up your revision planner profile", font=F(10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
         subtitle_label.pack(pady=(4, 18))
 
-        username_label = tk.Label(centre, text="Username", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        username_label = tk.Label(centre, text="Username", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         username_label.pack(fill="x")
         self.new_username_entry = self.build_auth_entry(centre)
         self.new_username_entry.pack(fill="x", ipady=5, pady=(2, 12))
         self.new_username_entry.focus_set()
 
-        password_label = tk.Label(centre, text="Password", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        password_label = tk.Label(centre, text="Password", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         password_label.pack(fill="x")
         self.new_password_entry = self.build_auth_entry(centre, show="*")
         self.new_password_entry.pack(fill="x", ipady=5, pady=(2, 2))
 
-        helper_label = tk.Label(centre, text="Must be at least 8 characters", font=("Segoe UI", 8), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
+        helper_label = tk.Label(centre, text="Must be at least 8 characters", font=F(8), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
         helper_label.pack(fill="x", pady=(0, 10))
 
-        confirm_label = tk.Label(centre, text="Confirm Password", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        confirm_label = tk.Label(centre, text="Confirm Password", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         confirm_label.pack(fill="x")
         self.confirm_password_entry = self.build_auth_entry(centre, show="*")
         self.confirm_password_entry.pack(fill="x", ipady=5, pady=(2, 8))
         self.confirm_password_entry.bind("<Return>", lambda event: self.create_account())
 
         self.show_create_password_var = tk.BooleanVar(value=False)
-        show_create_password_check = tk.Checkbutton(centre, text="Show password", variable=self.show_create_password_var, command=self.toggle_create_password_visibility, bg=COLOUR_BG, activebackground=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        show_create_password_check = tk.Checkbutton(centre, text="Show password", variable=self.show_create_password_var, command=self.toggle_create_password_visibility, bg=COLOUR_BG, activebackground=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         show_create_password_check.pack(anchor="w", pady=(0, 14))
 
         create_button = self.build_flat_button(centre, "Create Account", self.create_account, accent=True)
@@ -212,10 +276,10 @@ class RevisionPlannerApp:
         link_frame = tk.Frame(centre, bg=COLOUR_BG)
         link_frame.pack(pady=(14, 0))
 
-        link_text = tk.Label(link_frame, text="Already have an account? ", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        link_text = tk.Label(link_frame, text="Already have an account? ", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
         link_text.pack(side="left")
 
-        link = tk.Label(link_frame, text="Log in", font=("Segoe UI", 9, "underline"), bg=COLOUR_BG, fg=COLOUR_ACCENT, cursor="hand2")
+        link = tk.Label(link_frame, text="Log in", font=F(9, "underline"), bg=COLOUR_BG, fg=COLOUR_ACCENT, cursor="hand2")
         link.pack(side="left")
         link.bind("<Button-1>", lambda event: self.show_login_screen())
 
@@ -268,13 +332,13 @@ class RevisionPlannerApp:
         inner = tk.Frame(content, bg=COLOUR_BG)
         inner.pack(fill="both", expand=True, padx=24, pady=18)
 
-        welcome_label = tk.Label(inner, text=f"Welcome back, {self.pending_user.username}", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        welcome_label = tk.Label(inner, text=f"Welcome back, {self.pending_user.username}", font=F(18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         welcome_label.pack(fill="x")
 
-        subtitle_label = tk.Label(inner, text="Here's what's coming up", font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
+        subtitle_label = tk.Label(inner, text="Here's what's coming up", font=F(10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
         subtitle_label.pack(fill="x", pady=(0, 16))
 
-        deadlines_label = tk.Label(inner, text="Upcoming deadlines", font=("Segoe UI", 11, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        deadlines_label = tk.Label(inner, text="Upcoming deadlines", font=F(11, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         deadlines_label.pack(fill="x", pady=(0, 6))
 
         upcoming_tasks = self.get_upcoming_tasks()
@@ -300,25 +364,25 @@ class RevisionPlannerApp:
                     urgency_text = f"{days_remaining} days left"
                     badge_colour = COLOUR_LATER
 
-                card = tk.Frame(inner, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+                card = tk.Frame(inner, bg=COLOUR_CARD, highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
                 card.pack(fill="x", pady=4)
 
-                text_frame = tk.Frame(card, bg="#ffffff")
+                text_frame = tk.Frame(card, bg=COLOUR_CARD)
                 text_frame.pack(side="left", fill="x", expand=True, padx=10, pady=8)
 
-                title_label = tk.Label(text_frame, text=task.title, font=("Segoe UI", 10, "bold"), bg="#ffffff", fg=COLOUR_TEXT_DARK, anchor="w")
+                title_label = tk.Label(text_frame, text=task.title, font=F(10, "bold"), bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, anchor="w")
                 title_label.pack(fill="x")
 
-                date_label = tk.Label(text_frame, text=f"Due {task.deadline}", font=("Segoe UI", 9), bg="#ffffff", fg=COLOUR_TEXT_MUTED, anchor="w")
+                date_label = tk.Label(text_frame, text=f"Due {task.deadline}", font=F(9), bg=COLOUR_CARD, fg=COLOUR_TEXT_MUTED, anchor="w")
                 date_label.pack(fill="x")
 
-                badge = tk.Label(card, text=urgency_text, bg=badge_colour, fg="#ffffff", font=("Segoe UI", 9), padx=8, pady=2)
+                badge = tk.Label(card, text=urgency_text, bg=badge_colour, fg="#ffffff", font=F(9), padx=8, pady=2)
                 badge.pack(side="right", padx=10)
 
-        add_task_button = tk.Button(inner, text="+ Add new task", command=self.show_add_task_screen, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=("Segoe UI", 10), pady=6, cursor="hand2")
+        add_task_button = tk.Button(inner, text="+ Add new task", command=self.show_add_task_screen, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=F(10), pady=6, cursor="hand2")
         add_task_button.pack(fill="x", pady=(16, 0))
 
-        add_task_button.bind("<Enter>", lambda event: add_task_button.config(bg="#25578c"))
+        add_task_button.bind("<Enter>", lambda event: add_task_button.config(bg=COLOUR_ACCENT_HOVER))
         add_task_button.bind("<Leave>", lambda event: add_task_button.config(bg=COLOUR_ACCENT))
 
     def get_upcoming_tasks(self):
@@ -345,45 +409,45 @@ class RevisionPlannerApp:
         inner = tk.Frame(content, bg=COLOUR_BG)
         inner.pack(fill="both", expand=True, padx=24, pady=18)
 
-        label = tk.Label(inner, text="Add New Task", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label = tk.Label(inner, text="Add New Task", font=F(18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         label.pack(anchor="w", pady=(0, 16))
 
-        title_label = tk.Label(inner, text="Task Title", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        title_label = tk.Label(inner, text="Task Title", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         title_label.pack(fill="x")
-        self.task_title_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
+        self.task_title_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, insertbackground=COLOUR_TEXT_DARK, font=F(10))
         self.task_title_entry.pack(fill="x", ipady=4, pady=(2, 12))
 
-        subject_label = tk.Label(inner, text="Subject", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        subject_label = tk.Label(inner, text="Subject", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         subject_label.pack(fill="x")
         existing_subjects = self.get_existing_subjects()
-        self.task_subject_entry = ttk.Combobox(inner, values=existing_subjects, font=("Segoe UI", 10))
+        self.task_subject_entry = ttk.Combobox(inner, values=existing_subjects, font=F(10))
         self.task_subject_entry.pack(fill="x", ipady=2, pady=(2, 12))
 
-        deadline_label = tk.Label(inner, text="Deadline (DD/MM/YYYY)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        deadline_label = tk.Label(inner, text="Deadline (DD/MM/YYYY)", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         deadline_label.pack(fill="x")
-        self.task_deadline_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
+        self.task_deadline_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, insertbackground=COLOUR_TEXT_DARK, font=F(10))
         self.task_deadline_entry.pack(fill="x", ipady=4, pady=(2, 12))
 
-        duration_label = tk.Label(inner, text="Estimated Study Time (mins)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        duration_label = tk.Label(inner, text="Estimated Study Time (mins)", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         duration_label.pack(fill="x")
-        self.task_duration_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
+        self.task_duration_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, insertbackground=COLOUR_TEXT_DARK, font=F(10))
         self.task_duration_entry.pack(fill="x", ipady=4, pady=(2, 12))
 
-        confidence_label = tk.Label(inner, text="Confidence Rating (1-5)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        confidence_label = tk.Label(inner, text="Confidence Rating (1-5)", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         confidence_label.pack(fill="x")
-        self.task_confidence_entry = ttk.Spinbox(inner, from_=1, to=5, width=5, state="readonly", font=("Segoe UI", 10))
+        self.task_confidence_entry = ttk.Spinbox(inner, from_=1, to=5, width=5, state="readonly", font=F(10))
         self.task_confidence_entry.set(3)
         self.task_confidence_entry.pack(anchor="w", ipady=2, pady=(2, 16))
 
         button_frame = tk.Frame(inner, bg=COLOUR_BG)
         button_frame.pack(fill="x")
 
-        save_button = tk.Button(button_frame, text="Save Task", command=self.save_task, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=("Segoe UI", 10), padx=16, pady=6, cursor="hand2")
+        save_button = tk.Button(button_frame, text="Save Task", command=self.save_task, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=F(10), padx=16, pady=6, cursor="hand2")
         save_button.pack(side="left")
-        save_button.bind("<Enter>", lambda event: save_button.config(bg="#25578c"))
+        save_button.bind("<Enter>", lambda event: save_button.config(bg=COLOUR_ACCENT_HOVER))
         save_button.bind("<Leave>", lambda event: save_button.config(bg=COLOUR_ACCENT))
 
-        cancel_button = tk.Button(button_frame, text="Cancel", command=self.show_dashboard, relief="flat", bg="#f0f0f0", font=("Segoe UI", 10), padx=16, pady=6, cursor="hand2")
+        cancel_button = tk.Button(button_frame, text="Cancel", command=self.show_dashboard, relief="flat", bg=COLOUR_NEUTRAL, fg=COLOUR_TEXT_DARK, activebackground=COLOUR_NEUTRAL_HOVER, activeforeground=COLOUR_TEXT_DARK, font=F(10), padx=16, pady=6, cursor="hand2")
         cancel_button.pack(side="left", padx=8)
 
     def get_existing_subjects(self):
@@ -443,12 +507,12 @@ class RevisionPlannerApp:
         header_frame = tk.Frame(inner, bg=COLOUR_BG)
         header_frame.pack(fill="x")
 
-        label = tk.Label(header_frame, text="Your Tasks", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label = tk.Label(header_frame, text="Your Tasks", font=F(18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         label.pack(side="left")
 
-        add_task_button = tk.Button(header_frame, text="+ Add new task", command=self.show_add_task_screen, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=("Segoe UI", 9), padx=10, pady=4, cursor="hand2")
+        add_task_button = tk.Button(header_frame, text="+ Add new task", command=self.show_add_task_screen, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=F(9), padx=10, pady=4, cursor="hand2")
         add_task_button.pack(side="right")
-        add_task_button.bind("<Enter>", lambda event: add_task_button.config(bg="#25578c"))
+        add_task_button.bind("<Enter>", lambda event: add_task_button.config(bg=COLOUR_ACCENT_HOVER))
         add_task_button.bind("<Leave>", lambda event: add_task_button.config(bg=COLOUR_ACCENT))
 
         self.sort_var = tk.StringVar(value="Deadline")
@@ -459,16 +523,16 @@ class RevisionPlannerApp:
         controls_frame.pack(fill="x", pady=(14, 10))
 
         sort_menu = tk.OptionMenu(controls_frame, self.sort_var, "Deadline", "Name", "Duration", command=lambda _: self.refresh_task_list())
-        sort_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
+        self.style_option_menu(sort_menu)
         sort_menu.pack(side="left", padx=(0, 8))
 
         filter_menu = tk.OptionMenu(controls_frame, self.filter_var, "Incomplete Only", "Complete Only", "All", command=lambda _: self.refresh_task_list())
-        filter_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
+        self.style_option_menu(filter_menu)
         filter_menu.pack(side="left", padx=8)
 
         subject_options = ["All Subjects"] + self.get_existing_subjects()
         subject_filter_menu = tk.OptionMenu(controls_frame, self.subject_filter_var, *subject_options, command=lambda _: self.refresh_task_list())
-        subject_filter_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
+        self.style_option_menu(subject_filter_menu)
         subject_filter_menu.pack(side="left", padx=8)
 
         self.task_list_frame = tk.Frame(inner, bg=COLOUR_BG)
@@ -505,11 +569,11 @@ class RevisionPlannerApp:
             no_tasks_label.pack(pady=10)
 
         for task in tasks:
-            row = tk.Frame(self.task_list_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+            row = tk.Frame(self.task_list_frame, bg=COLOUR_CARD, highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
             row.pack(fill="x", pady=3)
 
             completed_var = tk.BooleanVar(value=task.completed)
-            complete_checkbox = tk.Checkbutton(row, variable=completed_var, bg="#ffffff", command=lambda t=task, v=completed_var: self.toggle_task_complete(t, v))
+            complete_checkbox = tk.Checkbutton(row, variable=completed_var, bg=COLOUR_CARD, command=lambda t=task, v=completed_var: self.toggle_task_complete(t, v))
             complete_checkbox.pack(side="left", padx=(10, 4))
 
             if task.completed:
@@ -520,19 +584,19 @@ class RevisionPlannerApp:
             else:
                 confidence_text = f"Confidence: {task.confidence_rating}"
 
-            text_frame = tk.Frame(row, bg="#ffffff")
+            text_frame = tk.Frame(row, bg=COLOUR_CARD)
             text_frame.pack(side="left", fill="x", expand=True, pady=8)
 
-            title_label = tk.Label(text_frame, text=task.title, font=("Segoe UI", 10, "bold"), bg="#ffffff", fg=COLOUR_TEXT_DARK, anchor="w")
+            title_label = tk.Label(text_frame, text=task.title, font=F(10, "bold"), bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, anchor="w")
             title_label.pack(fill="x")
 
-            meta_label = tk.Label(text_frame, text=f"{task.subject} — Due {task.deadline} — {confidence_text}", font=("Segoe UI", 9), bg="#ffffff", fg=COLOUR_TEXT_MUTED, anchor="w")
+            meta_label = tk.Label(text_frame, text=f"{task.subject} — Due {task.deadline} — {confidence_text}", font=F(9), bg=COLOUR_CARD, fg=COLOUR_TEXT_MUTED, anchor="w")
             meta_label.pack(fill="x")
 
-            delete_button = tk.Button(row, text="Delete", command=lambda t=task: self.confirm_delete_task(t), relief="flat", bg="#f0f0f0", font=("Segoe UI", 9), cursor="hand2")
+            delete_button = tk.Button(row, text="Delete", command=lambda t=task: self.confirm_delete_task(t), relief="flat", bg=COLOUR_NEUTRAL, fg=COLOUR_TEXT_DARK, activebackground=COLOUR_NEUTRAL_HOVER, activeforeground=COLOUR_TEXT_DARK, font=F(9), cursor="hand2")
             delete_button.pack(side="right", padx=(4, 10), pady=8)
 
-            edit_button = tk.Button(row, text="Edit", command=lambda t=task: self.show_edit_task_screen(t), relief="flat", bg="#f0f0f0", font=("Segoe UI", 9), cursor="hand2")
+            edit_button = tk.Button(row, text="Edit", command=lambda t=task: self.show_edit_task_screen(t), relief="flat", bg=COLOUR_NEUTRAL, fg=COLOUR_TEXT_DARK, activebackground=COLOUR_NEUTRAL_HOVER, activeforeground=COLOUR_TEXT_DARK, font=F(9), cursor="hand2")
             edit_button.pack(side="right", padx=4, pady=8)
 
     def toggle_task_complete(self, task, completed_var):
@@ -553,49 +617,49 @@ class RevisionPlannerApp:
         inner = tk.Frame(content, bg=COLOUR_BG)
         inner.pack(fill="both", expand=True, padx=24, pady=18)
 
-        label = tk.Label(inner, text="Edit Task", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label = tk.Label(inner, text="Edit Task", font=F(18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         label.pack(anchor="w", pady=(0, 16))
 
-        title_label = tk.Label(inner, text="Task Title", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        title_label = tk.Label(inner, text="Task Title", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         title_label.pack(fill="x")
-        self.edit_title_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
+        self.edit_title_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, insertbackground=COLOUR_TEXT_DARK, font=F(10))
         self.edit_title_entry.insert(0, task.title)
         self.edit_title_entry.pack(fill="x", ipady=4, pady=(2, 12))
 
-        subject_label = tk.Label(inner, text="Subject", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        subject_label = tk.Label(inner, text="Subject", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         subject_label.pack(fill="x")
         existing_subjects = self.get_existing_subjects()
-        self.edit_subject_entry = ttk.Combobox(inner, values=existing_subjects, font=("Segoe UI", 10))
+        self.edit_subject_entry = ttk.Combobox(inner, values=existing_subjects, font=F(10))
         self.edit_subject_entry.insert(0, task.subject)
         self.edit_subject_entry.pack(fill="x", ipady=2, pady=(2, 12))
 
-        deadline_label = tk.Label(inner, text="Deadline (DD/MM/YYYY)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        deadline_label = tk.Label(inner, text="Deadline (DD/MM/YYYY)", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         deadline_label.pack(fill="x")
-        self.edit_deadline_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
+        self.edit_deadline_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, insertbackground=COLOUR_TEXT_DARK, font=F(10))
         self.edit_deadline_entry.insert(0, task.deadline)
         self.edit_deadline_entry.pack(fill="x", ipady=4, pady=(2, 12))
 
-        duration_label = tk.Label(inner, text="Estimated Study Time (mins)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        duration_label = tk.Label(inner, text="Estimated Study Time (mins)", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         duration_label.pack(fill="x")
-        self.edit_duration_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10))
+        self.edit_duration_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, insertbackground=COLOUR_TEXT_DARK, font=F(10))
         self.edit_duration_entry.insert(0, str(task.duration))
         self.edit_duration_entry.pack(fill="x", ipady=4, pady=(2, 12))
 
-        confidence_label = tk.Label(inner, text="Confidence Rating (1-5)", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
+        confidence_label = tk.Label(inner, text="Confidence Rating (1-5)", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, anchor="w")
         confidence_label.pack(fill="x")
-        self.edit_confidence_entry = ttk.Spinbox(inner, from_=1, to=5, width=5, state="readonly", font=("Segoe UI", 10))
+        self.edit_confidence_entry = ttk.Spinbox(inner, from_=1, to=5, width=5, state="readonly", font=F(10))
         self.edit_confidence_entry.set(task.confidence_rating)
         self.edit_confidence_entry.pack(anchor="w", ipady=2, pady=(2, 16))
 
         button_frame = tk.Frame(inner, bg=COLOUR_BG)
         button_frame.pack(fill="x")
 
-        save_button = tk.Button(button_frame, text="Save Changes", command=self.save_edited_task, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=("Segoe UI", 10), padx=16, pady=6, cursor="hand2")
+        save_button = tk.Button(button_frame, text="Save Changes", command=self.save_edited_task, bg=COLOUR_ACCENT, fg=COLOUR_ACCENT_TEXT, activebackground=COLOUR_ACCENT, activeforeground=COLOUR_ACCENT_TEXT, relief="flat", font=F(10), padx=16, pady=6, cursor="hand2")
         save_button.pack(side="left")
-        save_button.bind("<Enter>", lambda event: save_button.config(bg="#25578c"))
+        save_button.bind("<Enter>", lambda event: save_button.config(bg=COLOUR_ACCENT_HOVER))
         save_button.bind("<Leave>", lambda event: save_button.config(bg=COLOUR_ACCENT))
 
-        cancel_button = tk.Button(button_frame, text="Cancel", command=self.show_task_list_screen, relief="flat", bg="#f0f0f0", font=("Segoe UI", 10), padx=16, pady=6, cursor="hand2")
+        cancel_button = tk.Button(button_frame, text="Cancel", command=self.show_task_list_screen, relief="flat", bg=COLOUR_NEUTRAL, fg=COLOUR_TEXT_DARK, activebackground=COLOUR_NEUTRAL_HOVER, activeforeground=COLOUR_TEXT_DARK, font=F(10), padx=16, pady=6, cursor="hand2")
         cancel_button.pack(side="left", padx=8)
 
     def save_edited_task(self):
@@ -658,7 +722,7 @@ class RevisionPlannerApp:
         inner = tk.Frame(content, bg=COLOUR_BG)
         inner.pack(fill="both", expand=True, padx=24, pady=18)
 
-        label = tk.Label(inner, text="Select a task to study", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label = tk.Label(inner, text="Select a task to study", font=F(18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         label.pack(anchor="w", pady=(0, 16))
 
         incomplete_tasks = [t for t in self.pending_user.tasks if not t.completed]
@@ -674,16 +738,16 @@ class RevisionPlannerApp:
                 else:
                     meta_text = task.subject
 
-                card = tk.Frame(inner, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, cursor="hand2")
+                card = tk.Frame(inner, bg=COLOUR_CARD, highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, cursor="hand2")
                 card.pack(fill="x", pady=3)
 
-                text_frame = tk.Frame(card, bg="#ffffff")
+                text_frame = tk.Frame(card, bg=COLOUR_CARD)
                 text_frame.pack(side="left", fill="x", expand=True, padx=10, pady=8)
 
-                title_label = tk.Label(text_frame, text=task.title, font=("Segoe UI", 10, "bold"), bg="#ffffff", fg=COLOUR_TEXT_DARK, anchor="w")
+                title_label = tk.Label(text_frame, text=task.title, font=F(10, "bold"), bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, anchor="w")
                 title_label.pack(fill="x")
 
-                meta_label = tk.Label(text_frame, text=meta_text, font=("Segoe UI", 9), bg="#ffffff", fg=COLOUR_TEXT_MUTED, anchor="w")
+                meta_label = tk.Label(text_frame, text=meta_text, font=F(9), bg=COLOUR_CARD, fg=COLOUR_TEXT_MUTED, anchor="w")
                 meta_label.pack(fill="x")
 
                 for widget in (card, text_frame, title_label, meta_label):
@@ -705,16 +769,16 @@ class RevisionPlannerApp:
         centre_frame = tk.Frame(inner, bg=COLOUR_BG)
         centre_frame.pack(expand=True)
 
-        studying_label = tk.Label(centre_frame, text="Currently studying", font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        studying_label = tk.Label(centre_frame, text="Currently studying", font=F(10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
         studying_label.pack(pady=(0, 2))
 
-        task_label = tk.Label(centre_frame, text=task.title, font=("Segoe UI", 16, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        task_label = tk.Label(centre_frame, text=task.title, font=F(16, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         task_label.pack()
 
-        self.timer_display_label = tk.Label(centre_frame, text=self.format_time(task.elapsed_seconds), font=("Segoe UI", 44, "bold"), bg=COLOUR_BG, fg=COLOUR_ACCENT)
+        self.timer_display_label = tk.Label(centre_frame, text=self.format_time(task.elapsed_seconds), font=F(44, "bold"), bg=COLOUR_BG, fg=COLOUR_ACCENT)
         self.timer_display_label.pack(pady=20)
 
-        target_label = tk.Label(centre_frame, text=f"Target: {task.duration} minutes", font=("Segoe UI", 9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        target_label = tk.Label(centre_frame, text=f"Target: {task.duration} minutes", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
         target_label.pack(pady=(0, 16))
 
         controls_frame = tk.Frame(centre_frame, bg=COLOUR_BG)
@@ -745,13 +809,13 @@ class RevisionPlannerApp:
 
     def build_flat_button(self, parent, text, command, accent=False, danger=False):
         if accent:
-            bg, fg, hover = COLOUR_ACCENT, COLOUR_ACCENT_TEXT, "#25578c"
+            bg, fg, hover = COLOUR_ACCENT, COLOUR_ACCENT_TEXT, COLOUR_ACCENT_HOVER
         elif danger:
             bg, fg, hover = COLOUR_URGENT, "#ffffff", "#b8463f"
         else:
-            bg, fg, hover = "#f0f0f0", COLOUR_TEXT_DARK, "#e0e0e0"
+            bg, fg, hover = COLOUR_NEUTRAL, COLOUR_TEXT_DARK, COLOUR_NEUTRAL_HOVER
 
-        button = tk.Button(parent, text=text, command=command, bg=bg, fg=fg, activebackground=bg, activeforeground=fg, relief="flat", font=("Segoe UI", 9), padx=10, pady=6, cursor="hand2")
+        button = tk.Button(parent, text=text, command=command, bg=bg, fg=fg, activebackground=bg, activeforeground=fg, relief="flat", font=F(9), padx=10, pady=6, cursor="hand2")
         button.bind("<Enter>", lambda event: button.config(bg=hover) if button["state"] != "disabled" else None)
         button.bind("<Leave>", lambda event: button.config(bg=bg) if button["state"] != "disabled" else None)
         return button
@@ -846,16 +910,16 @@ class RevisionPlannerApp:
         centre_frame = tk.Frame(inner, bg=COLOUR_BG)
         centre_frame.pack(expand=True)
 
-        finished_label = tk.Label(centre_frame, text="Session finished", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        finished_label = tk.Label(centre_frame, text="Session finished", font=F(18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         finished_label.pack(pady=(0, 4))
 
-        task_label = tk.Label(centre_frame, text=self.timer_task.title, font=("Segoe UI", 10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
+        task_label = tk.Label(centre_frame, text=self.timer_task.title, font=F(10), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED)
         task_label.pack()
 
-        time_label = tk.Label(centre_frame, text=f"Time studied: {self.format_time(total_seconds)}", font=("Segoe UI", 14, "bold"), bg=COLOUR_BG, fg=COLOUR_ACCENT)
+        time_label = tk.Label(centre_frame, text=f"Time studied: {self.format_time(total_seconds)}", font=F(14, "bold"), bg=COLOUR_BG, fg=COLOUR_ACCENT)
         time_label.pack(pady=18)
 
-        complete_label = tk.Label(centre_frame, text="Is this task complete?", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        complete_label = tk.Label(centre_frame, text="Is this task complete?", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         complete_label.pack(pady=(0, 6))
 
         choice_frame = tk.Frame(centre_frame, bg=COLOUR_BG)
@@ -867,11 +931,11 @@ class RevisionPlannerApp:
         no_button = self.build_flat_button(choice_frame, "Not yet", lambda: self.finish_session(mark_complete=False))
         no_button.pack(side="left", padx=5)
 
-        confidence_label = tk.Label(centre_frame, text="Update confidence rating (1-5)", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        confidence_label = tk.Label(centre_frame, text="Update confidence rating (1-5)", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         confidence_label.pack(pady=(0, 4))
 
         self.confidence_var = tk.StringVar(value=str(self.timer_task.confidence_rating))
-        confidence_spinbox = ttk.Spinbox(centre_frame, from_=1, to=5, textvariable=self.confidence_var, width=5, state="readonly", font=("Segoe UI", 10))
+        confidence_spinbox = ttk.Spinbox(centre_frame, from_=1, to=5, textvariable=self.confidence_var, width=5, state="readonly", font=F(10))
         confidence_spinbox.pack()
         
     def finish_session(self, mark_complete):
@@ -908,42 +972,42 @@ class RevisionPlannerApp:
         inner = tk.Frame(content, bg=COLOUR_BG)
         inner.pack(fill="both", expand=True, padx=24, pady=18)
 
-        label = tk.Label(inner, text="Settings", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label = tk.Label(inner, text="Settings", font=F(18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         label.pack(anchor="w", pady=(0, 16))
 
         settings = self.pending_user.settings
 
-        appearance_label = tk.Label(inner, text="APPEARANCE", font=("Segoe UI", 9, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
+        appearance_label = tk.Label(inner, text="APPEARANCE", font=F(9, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
         appearance_label.pack(fill="x", pady=(0, 8))
 
-        theme_label = tk.Label(inner, text="Theme", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9), anchor="w")
+        theme_label = tk.Label(inner, text="Theme", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9), anchor="w")
         theme_label.pack(fill="x")
         self.theme_var = tk.StringVar(value=settings.theme)
         theme_menu = tk.OptionMenu(inner, self.theme_var, "light", "dark")
-        theme_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
+        self.style_option_menu(theme_menu)
         theme_menu.pack(anchor="w", pady=(2, 12))
 
-        font_size_label = tk.Label(inner, text="Font size", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9), anchor="w")
+        font_size_label = tk.Label(inner, text="Font size", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9), anchor="w")
         font_size_label.pack(fill="x")
         self.font_size_var = tk.StringVar(value=settings.font_size)
         font_size_menu = tk.OptionMenu(inner, self.font_size_var, "small", "medium", "large")
-        font_size_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
+        self.style_option_menu(font_size_menu)
         font_size_menu.pack(anchor="w", pady=(2, 12))
 
         self.high_contrast_var = tk.BooleanVar(value=settings.high_contrast)
-        high_contrast_checkbox = tk.Checkbutton(inner, text="High Contrast Mode", variable=self.high_contrast_var, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        high_contrast_checkbox = tk.Checkbutton(inner, text="High Contrast Mode", variable=self.high_contrast_var, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         high_contrast_checkbox.pack(anchor="w", pady=(0, 20))
 
-        reminders_label = tk.Label(inner, text="REMINDERS", font=("Segoe UI", 9, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
+        reminders_label = tk.Label(inner, text="REMINDERS", font=F(9, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
         reminders_label.pack(fill="x", pady=(0, 8))
 
         self.reminders_enabled_var = tk.BooleanVar(value=settings.reminders_enabled)
-        reminders_checkbox = tk.Checkbutton(inner, text="Enable reminders", variable=self.reminders_enabled_var, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        reminders_checkbox = tk.Checkbutton(inner, text="Enable reminders", variable=self.reminders_enabled_var, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         reminders_checkbox.pack(anchor="w", pady=(0, 10))
 
-        reminder_days_label = tk.Label(inner, text="Remind me this many days before a deadline", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9), anchor="w")
+        reminder_days_label = tk.Label(inner, text="Remind me this many days before a deadline", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9), anchor="w")
         reminder_days_label.pack(fill="x")
-        self.reminder_days_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, font=("Segoe UI", 10), width=6)
+        self.reminder_days_entry = tk.Entry(inner, relief="flat", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1, bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, insertbackground=COLOUR_TEXT_DARK, font=F(10), width=6)
         self.reminder_days_entry.insert(0, str(settings.reminder_days))
         self.reminder_days_entry.pack(anchor="w", ipady=4, pady=(2, 20))
 
@@ -964,6 +1028,7 @@ class RevisionPlannerApp:
         self.pending_user.settings.reminder_days = int(reminder_days_text)
 
         self.save_current_user()
+        self.apply_user_theme()
 
         messagebox.showinfo("Settings Saved", "Your settings have been saved.")
         self.show_dashboard()
@@ -1117,7 +1182,7 @@ class RevisionPlannerApp:
         if self.current_month_start is None:
             self.current_month_start, _ = self.get_month_range(datetime.now().date())
 
-        label = tk.Label(inner, text="Statistics", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label = tk.Label(inner, text="Statistics", font=F(18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         label.pack(anchor="w")
 
         mode_frame = tk.Frame(inner, bg=COLOUR_BG)
@@ -1125,7 +1190,7 @@ class RevisionPlannerApp:
 
         self.stats_view_var = tk.StringVar(value=self.stats_view_mode)
         view_menu = tk.OptionMenu(mode_frame, self.stats_view_var, "weekly", "monthly", command=lambda choice: self.change_stats_view(choice))
-        view_menu.config(bg="#ffffff", relief="flat", font=("Segoe UI", 9))
+        self.style_option_menu(view_menu)
         view_menu.pack()
 
         if self.stats_view_mode == "weekly":
@@ -1146,7 +1211,7 @@ class RevisionPlannerApp:
         prev_button = self.build_flat_button(nav_frame, "← Previous", self.go_to_previous_period)
         prev_button.pack(side="left", padx=(0, 8))
 
-        period_label = tk.Label(nav_frame, text=period_label_text, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 10))
+        period_label = tk.Label(nav_frame, text=period_label_text, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(10))
         period_label.pack(side="left", padx=8)
 
         next_button = self.build_flat_button(nav_frame, "Next →", self.go_to_next_period)
@@ -1158,19 +1223,19 @@ class RevisionPlannerApp:
         summary_frame = tk.Frame(inner, bg=COLOUR_BG)
         summary_frame.pack(anchor="w", pady=(0, 14))
 
-        total_time_label = tk.Label(summary_frame, text=f"Total study time: {self.format_time(stats['total_seconds'])}", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        total_time_label = tk.Label(summary_frame, text=f"Total study time: {self.format_time(stats['total_seconds'])}", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         total_time_label.pack(anchor="w")
 
-        completed_label = tk.Label(summary_frame, text=f"Tasks completed: {stats['completed_count']} / {stats['total_count']}", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        completed_label = tk.Label(summary_frame, text=f"Tasks completed: {stats['completed_count']} / {stats['total_count']}", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         completed_label.pack(anchor="w")
 
-        confidence_label = tk.Label(summary_frame, text=f"Average confidence: {stats['average_confidence']} / 5", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 9))
+        confidence_label = tk.Label(summary_frame, text=f"Average confidence: {stats['average_confidence']} / 5", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         confidence_label.pack(anchor="w")
 
         charts_frame = tk.Frame(inner, bg=COLOUR_BG)
         charts_frame.pack(fill="x", pady=10)
 
-        bar_frame = tk.Frame(charts_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+        bar_frame = tk.Frame(charts_frame, bg=COLOUR_CARD, highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
         bar_frame.pack(side="left", padx=(0, 10), fill="both", expand=True)
 
         subjects = list(set(t.subject for t in tasks) | set(stats['subject_totals'].keys()))
@@ -1195,9 +1260,9 @@ class RevisionPlannerApp:
             bar_canvas.draw()
             bar_canvas.get_tk_widget().pack(padx=8, pady=8)
         else:
-            tk.Label(bar_frame, text="No study data for this period", bg="#ffffff", fg=COLOUR_TEXT_MUTED).pack(pady=40)
+            tk.Label(bar_frame, text="No study data for this period", bg=COLOUR_CARD, fg=COLOUR_TEXT_MUTED).pack(pady=40)
 
-        pie_frame = tk.Frame(charts_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+        pie_frame = tk.Frame(charts_frame, bg=COLOUR_CARD, highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
         pie_frame.pack(side="left", fill="both", expand=True)
 
         has_completion_data = stats['completed_count'] > 0 or (stats['total_count'] - stats['completed_count']) > 0
@@ -1212,7 +1277,7 @@ class RevisionPlannerApp:
             pie_canvas.draw()
             pie_canvas.get_tk_widget().pack(padx=8, pady=8)
         else:
-            tk.Label(pie_frame, text="No task activity for this period", bg="#ffffff", fg=COLOUR_TEXT_MUTED).pack(pady=40)
+            tk.Label(pie_frame, text="No task activity for this period", bg=COLOUR_CARD, fg=COLOUR_TEXT_MUTED).pack(pady=40)
 
         links_frame = tk.Frame(inner, bg=COLOUR_BG)
         links_frame.pack(anchor="w", pady=(14, 0))
@@ -1243,7 +1308,7 @@ class RevisionPlannerApp:
 
         advanced_stats = self.calculate_advanced_statistics(period_start, period_end)
 
-        label = tk.Label(inner, text="More Statistics", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label = tk.Label(inner, text="More Statistics", font=F(18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         label.pack(anchor="w", pady=(0, 10))
 
         nav_frame = tk.Frame(inner, bg=COLOUR_BG)
@@ -1252,7 +1317,7 @@ class RevisionPlannerApp:
         prev_button = self.build_flat_button(nav_frame, "← Previous", self.go_to_previous_period)
         prev_button.pack(side="left", padx=(0, 8))
 
-        period_label = tk.Label(nav_frame, text=period_label_text, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 10))
+        period_label = tk.Label(nav_frame, text=period_label_text, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(10))
         period_label.pack(side="left", padx=8)
 
         next_button = self.build_flat_button(nav_frame, "Next →", self.go_to_next_period)
@@ -1264,7 +1329,7 @@ class RevisionPlannerApp:
         charts_frame = tk.Frame(inner, bg=COLOUR_BG)
         charts_frame.pack(fill="x")
 
-        time_frame = tk.Frame(charts_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+        time_frame = tk.Frame(charts_frame, bg=COLOUR_CARD, highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
         time_frame.pack(side="left", padx=(0, 10), fill="both", expand=True)
 
         time_data = advanced_stats["time_vs_estimate"]
@@ -1292,9 +1357,9 @@ class RevisionPlannerApp:
             time_canvas.draw()
             time_canvas.get_tk_widget().pack(padx=8, pady=8)
         else:
-            tk.Label(time_frame, text="No studied tasks this period", bg="#ffffff", fg=COLOUR_TEXT_MUTED).pack(pady=40)
+            tk.Label(time_frame, text="No studied tasks this period", bg=COLOUR_CARD, fg=COLOUR_TEXT_MUTED).pack(pady=40)
 
-        confidence_frame = tk.Frame(charts_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+        confidence_frame = tk.Frame(charts_frame, bg=COLOUR_CARD, highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
         confidence_frame.pack(side="left", fill="both", expand=True)
 
         confidence_data = advanced_stats["confidence_changes"]
@@ -1323,7 +1388,7 @@ class RevisionPlannerApp:
             confidence_canvas.draw()
             confidence_canvas.get_tk_widget().pack(padx=8, pady=8)
         else:
-            tk.Label(confidence_frame, text="No confidence changes this period", bg="#ffffff", fg=COLOUR_TEXT_MUTED).pack(pady=40)
+            tk.Label(confidence_frame, text="No confidence changes this period", bg=COLOUR_CARD, fg=COLOUR_TEXT_MUTED).pack(pady=40)
 
         back_button = self.build_flat_button(inner, "Back to Statistics", self.show_statistics_screen)
         back_button.pack(anchor="w", pady=(16, 0))
@@ -1411,7 +1476,7 @@ class RevisionPlannerApp:
 
         stats = self.calculate_statistics(start_date=period_start, end_date=period_end)
 
-        label = tk.Label(inner, text="Progress Report", font=("Segoe UI", 18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label = tk.Label(inner, text="Progress Report", font=F(18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
         label.pack(anchor="w", pady=(0, 10))
 
         nav_frame = tk.Frame(inner, bg=COLOUR_BG)
@@ -1427,10 +1492,10 @@ class RevisionPlannerApp:
         today_button.pack(side="left", padx=8)
 
         summary_text = f"For {period_text}, you completed {stats['completed_count']} of {stats['total_count']} tasks and studied for {self.format_time_readable(stats['total_seconds'])}."
-        summary_label = tk.Label(inner, text=summary_text, wraplength=520, justify="left", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=("Segoe UI", 10), anchor="w")
+        summary_label = tk.Label(inner, text=summary_text, wraplength=520, justify="left", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(10), anchor="w")
         summary_label.pack(fill="x", pady=(0, 16))
 
-        feedback_label = tk.Label(inner, text="SUBJECT FEEDBACK", font=("Segoe UI", 9, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
+        feedback_label = tk.Label(inner, text="SUBJECT FEEDBACK", font=F(9, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
         feedback_label.pack(fill="x", pady=(0, 6))
 
         feedback_frame = tk.Frame(inner, bg=COLOUR_BG)
@@ -1460,19 +1525,19 @@ class RevisionPlannerApp:
                 feedback_text = f"You haven't studied this yet {period_word}, consider giving it some attention."
                 strip_colour = COLOUR_URGENT
 
-            card = tk.Frame(feedback_frame, bg="#ffffff", highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
+            card = tk.Frame(feedback_frame, bg=COLOUR_CARD, highlightbackground=COLOUR_CARD_BORDER, highlightthickness=1)
             card.pack(fill="x", pady=3)
 
             strip = tk.Frame(card, bg=strip_colour, width=5)
             strip.pack(side="left", fill="y")
 
-            text_frame = tk.Frame(card, bg="#ffffff")
+            text_frame = tk.Frame(card, bg=COLOUR_CARD)
             text_frame.pack(side="left", fill="x", expand=True, padx=10, pady=8)
 
-            subject_label = tk.Label(text_frame, text=subject, font=("Segoe UI", 10, "bold"), bg="#ffffff", fg=COLOUR_TEXT_DARK, anchor="w")
+            subject_label = tk.Label(text_frame, text=subject, font=F(10, "bold"), bg=COLOUR_CARD, fg=COLOUR_TEXT_DARK, anchor="w")
             subject_label.pack(fill="x")
 
-            message_label = tk.Label(text_frame, text=feedback_text, font=("Segoe UI", 9), bg="#ffffff", fg=COLOUR_TEXT_MUTED, anchor="w", wraplength=480, justify="left")
+            message_label = tk.Label(text_frame, text=feedback_text, font=F(9), bg=COLOUR_CARD, fg=COLOUR_TEXT_MUTED, anchor="w", wraplength=480, justify="left")
             message_label.pack(fill="x")
 
         back_button = self.build_flat_button(inner, "Back to Statistics", self.show_statistics_screen)
@@ -1523,9 +1588,9 @@ class RevisionPlannerApp:
     def create_sidebar_item(self, sidebar, label, command, is_active, position):
         item_bg = COLOUR_ACCENT if is_active else COLOUR_SIDEBAR
         item_fg = COLOUR_ACCENT_TEXT if is_active else COLOUR_TEXT_DARK
-        hover_bg = COLOUR_ACCENT if is_active else "#dce6f0"
+        hover_bg = COLOUR_ACCENT if is_active else COLOUR_SIDEBAR_HOVER
 
-        item = tk.Label(sidebar, text=label, bg=item_bg, fg=item_fg, font=("Segoe UI", 10), anchor="w", padx=14, pady=9, cursor="hand2")
+        item = tk.Label(sidebar, text=label, bg=item_bg, fg=item_fg, font=F(10), anchor="w", padx=14, pady=9, cursor="hand2")
         item.pack(fill="x", padx=6, pady=2, side=position)
         item.bind("<Button-1>", lambda event: command())
 

@@ -161,3 +161,21 @@ Plan for that pass:
 - Re-render the current screen when settings are saved so changes show immediately.
 
 Known limitation: messagebox popups (errors, confirmations, reminders) are native OS dialogs and cannot be themed. They will stay in the OS default style whichever theme is chosen.
+
+
+## Status update: earlier entries now resolved
+
+Several earlier entries describe work that was outstanding when they were written. They are kept unchanged as a record of the development process, but all of it is now complete:
+
+- "Features still to build (as of Study Timer completion)": confidence update on session finish, manual complete toggle, Settings screen, reminder logic, Statistics dashboard and Progress report are all built and tested.
+- Statistics first-pass issues (bar chart rounding, missing average confidence, missing pie chart), the week navigation issues, the time-period filtering plan and its planned order of work are all implemented, including the monthly view.
+- Progress report feedback wording was redesigned to be time-aware rather than based on completion alone.
+- "Dark mode, high contrast and font size: saved but not yet applied" is now implemented through the palette system, the F() font helper, ttk.Style and style_chart(). Remaining limitation: messagebox popups are native OS dialogs and cannot be themed.
+
+## Decision: auto-login will not be built
+
+Considered an auto-login toggle in Settings and decided against it. The system is designed for several people sharing one computer, so skipping the password step conflicts with that, and logging out is now a deliberate action with a confirmation. It would also need a password or token stored on disk, and passwords are already stored in plain text (see below).
+
+## Known limitation: passwords are stored in plain text
+
+Passwords are saved unhashed in users.json. This is acceptable for a locally-run coursework prototype with no network access, but a real system would store a salted hash (for example using hashlib.pbkdf2_hmac) and compare hashes at login. Logged as a limitation and as a future development suggestion.

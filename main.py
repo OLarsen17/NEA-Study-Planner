@@ -166,6 +166,14 @@ class RevisionPlannerApp:
         for spine in ax.spines.values():
             spine.set_color(COLOUR_TEXT_MUTED)
 
+    def build_checkbutton(self, parent, **options):
+        options.setdefault("bg", COLOUR_BG)
+        options.setdefault("fg", COLOUR_TEXT_DARK)
+        options.setdefault("activebackground", options["bg"])
+        options.setdefault("activeforeground", COLOUR_TEXT_DARK)
+        options.setdefault("selectcolor", COLOUR_CARD)
+        return tk.Checkbutton(parent, **options)
+
     def show_welcome_screen(self):
         self.clear_screen()
         self.apply_default_theme()
@@ -235,7 +243,7 @@ class RevisionPlannerApp:
         self.password_entry.focus_set()
 
         self.show_password_var = tk.BooleanVar(value=False)
-        show_password_check = tk.Checkbutton(centre, text="Show password", variable=self.show_password_var, command=self.toggle_password_visibility, bg=COLOUR_BG, activebackground=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
+        show_password_check = self.build_checkbutton(centre, text="Show password", variable=self.show_password_var, command=self.toggle_password_visibility, bg=COLOUR_BG, activebackground=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         show_password_check.pack(anchor="w", pady=(0, 16))
 
         continue_button = self.build_flat_button(centre, "Continue", self.check_password, accent=True)
@@ -313,7 +321,7 @@ class RevisionPlannerApp:
         self.confirm_password_entry.bind("<Return>", lambda event: self.create_account())
 
         self.show_create_password_var = tk.BooleanVar(value=False)
-        show_create_password_check = tk.Checkbutton(centre, text="Show password", variable=self.show_create_password_var, command=self.toggle_create_password_visibility, bg=COLOUR_BG, activebackground=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
+        show_create_password_check = self.build_checkbutton(centre, text="Show password", variable=self.show_create_password_var, command=self.toggle_create_password_visibility, bg=COLOUR_BG, activebackground=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         show_create_password_check.pack(anchor="w", pady=(0, 14))
 
         create_button = self.build_flat_button(centre, "Create Account", self.create_account, accent=True)
@@ -619,7 +627,7 @@ class RevisionPlannerApp:
             row.pack(fill="x", pady=3)
 
             completed_var = tk.BooleanVar(value=task.completed)
-            complete_checkbox = tk.Checkbutton(row, variable=completed_var, bg=COLOUR_CARD, command=lambda t=task, v=completed_var: self.toggle_task_complete(t, v))
+            complete_checkbox = self.build_checkbutton(row, variable=completed_var, bg=COLOUR_CARD, command=lambda t=task, v=completed_var: self.toggle_task_complete(t, v))
             complete_checkbox.pack(side="left", padx=(10, 4))
 
             if task.completed:
@@ -1041,14 +1049,14 @@ class RevisionPlannerApp:
         font_size_menu.pack(anchor="w", pady=(2, 12))
 
         self.high_contrast_var = tk.BooleanVar(value=settings.high_contrast)
-        high_contrast_checkbox = tk.Checkbutton(inner, text="High Contrast Mode", variable=self.high_contrast_var, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
+        high_contrast_checkbox = self.build_checkbutton(inner, text="High Contrast Mode", variable=self.high_contrast_var, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         high_contrast_checkbox.pack(anchor="w", pady=(0, 20))
 
         reminders_label = tk.Label(inner, text="REMINDERS", font=F(9, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, anchor="w")
         reminders_label.pack(fill="x", pady=(0, 8))
 
         self.reminders_enabled_var = tk.BooleanVar(value=settings.reminders_enabled)
-        reminders_checkbox = tk.Checkbutton(inner, text="Enable reminders", variable=self.reminders_enabled_var, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
+        reminders_checkbox = self.build_checkbutton(inner, text="Enable reminders", variable=self.reminders_enabled_var, bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9))
         reminders_checkbox.pack(anchor="w", pady=(0, 10))
 
         reminder_days_label = tk.Label(inner, text="Remind me this many days before a deadline", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9), anchor="w")

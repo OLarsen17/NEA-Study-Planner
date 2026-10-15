@@ -130,7 +130,7 @@
             }
         ],
         "settings": {
-            "theme": "dark",
+            "theme": "light",
             "font_size": "large",
             "high_contrast": false,
             "reminders_enabled": true,
@@ -189,5 +189,46 @@
             "reminder_days": 3
         },
         "created_date": "2026-09-30"
+    },
+    {
+        "username": "kajaniga09",
+        "password": "onyema123",
+        "tasks": [
+            {
+                "id": "7b838b56-74ca-4b20-b1ea-db0acf077804",
+                "title": "miss hussain chapter 9 :(",
+                "subject": "maths",
+                "deadline": "03/11/2026",
+                "duration": 360,
+                "confidence_rating": 1,
+                "initial_confidence_rating": 1,
+                "completed": false,
+                "reminder_sent": false,
+                "elapsed_seconds": 0,
+                "completed_date": null
+            },
+            {
+                "id": "104d543d-d494-4893-82b6-8e0bd18d3f77",
+                "title": "uuju8h",
+                "subject": "maths",
+                "deadline": "16/10/2026",
+                "duration": 2,
+                "confidence_rating": 3,
+                "initial_confidence_rating": 3,
+                "completed": false,
+                "reminder_sent": true,
+                "elapsed_seconds": 0,
+                "completed_date": null
+            }
+        ],
+        "sessions": [],
+        "settings": {
+            "theme": "dark",
+            "font_size": "large",
+            "high_contrast": false,
+            "reminders_enabled": true,
+            "reminder_days": 3
+        },
+        "created_date": "2026-10-14"
     }
 ]

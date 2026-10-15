@@ -1630,7 +1630,7 @@ class RevisionPlannerApp:
         ]
 
         bottom_items = [
-            ("Logout", self.show_welcome_screen),
+            ("Logout", self.confirm_logout),
             ("Settings", self.show_settings_screen),
         ]
 
@@ -1644,6 +1644,18 @@ class RevisionPlannerApp:
         content.pack(side="left", fill="both", expand=True)
 
         return content
+
+    def confirm_logout(self):
+        confirmed = messagebox.askyesno("Log out", "Are you sure you want to log out?")
+        if confirmed:
+            self.log_out()
+
+    def log_out(self):
+        self.current_week_start = None
+        self.current_month_start = None
+        self.stats_view_mode = "weekly"
+        self.current_stats_screen = "statistics"
+        self.show_welcome_screen()
 
     def create_sidebar_item(self, sidebar, label, command, is_active, position):
         item_bg = COLOUR_ACCENT if is_active else COLOUR_SIDEBAR

@@ -1210,13 +1210,6 @@ class RevisionPlannerApp:
         sunday = monday + timedelta(days=6)
         return monday, sunday
 
-    def print_test_statistics(self):
-        stats = self.calculate_statistics()
-        print(f"Total time: {self.format_time(stats['total_seconds'])}")
-        for subject, seconds in stats['subject_totals'].items():
-            print(f"{subject}: {self.format_time(seconds)}")
-        print(f"Completed: {stats['completed_count']} / {stats['total_count']}")
-
     def format_time_readable(self, total_seconds):
         minutes = total_seconds // 60
         seconds = total_seconds % 60

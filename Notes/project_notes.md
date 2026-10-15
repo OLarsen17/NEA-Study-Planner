@@ -179,3 +179,16 @@ Considered an auto-login toggle in Settings and decided against it. The system i
 ## Known limitation: passwords are stored in plain text
 
 Passwords are saved unhashed in users.json. This is acceptable for a locally-run coursework prototype with no network access, but a real system would store a salted hash (for example using hashlib.pbkdf2_hmac) and compare hashes at login. Logged as a limitation and as a future development suggestion.
+
+
+## Planned feature: custom colour theme
+
+As well as light and dark, a user could choose a "custom" theme and set their own colours on a separate screen reached from Settings.
+
+Initial design decisions:
+- Custom is a third option in the Theme dropdown. High contrast stays a separate setting that overrides whichever theme is chosen.
+- Five colours are user-editable: background, sidebar, cards and fields, buttons and highlights, and text. Everything else (hover shades, muted text, borders, text colour on buttons) is calculated from those five, so the app can't end up half-themed. Status colours (urgent/soon) stay fixed so their meaning is consistent.
+- Colours are picked with the operating system's colour picker (tkinter.colorchooser) rather than typed as hex codes, and stored per user in Settings.
+- Saving from the colour screen switches the user's theme to custom and applies it immediately.
+
+Open issues: users can pick unreadable combinations (for example text the same colour as the background). A contrast check is needed, since accessibility was a core requirement. A live preview would also help, because without it the user only sees the result after saving.

@@ -113,6 +113,7 @@ class RevisionPlannerApp:
         self.stats_view_mode = "weekly"
         self.current_month_start = None
         self.current_stats_screen = "statistics"
+        self.timer_screen_active = False
 
         self.show_welcome_screen()
 
@@ -812,6 +813,7 @@ class RevisionPlannerApp:
         self.timer_running = False
         self.sitting_seconds = 0
         self.timer_session_start = None
+        self.timer_screen_active = True
 
         self.clear_screen()
 
@@ -936,13 +938,26 @@ class RevisionPlannerApp:
             return self.sitting_seconds
 
     def continue_later(self):
-        total_sitting_seconds = self.get_current_sitting_seconds()
-        self.timer_task.elapsed_seconds += total_sitting_seconds
-
-        self.save_current_user()
+        self.save_timer_sitting_if_active()
         self.show_timer_task_select_screen()
 
+    def save_timer_sitting_if_active(self):
+        if not self.timer_screen_active:
+            return
+
+        self.timer_task.elapsed_seconds += self.get_current_sitting_seconds()
+        self.timer_running = False
+        self.sitting_seconds = 0
+        self.timer_screen_active = False
+        self.save_current_user()
+
+    def navigate_from_sidebar(self, command):
+        if command != self.confirm_logout:
+            self.save_timer_sitting_if_active()
+        command()
+
     def stop_timer(self):
+        self.timer_screen_active = False
         
         total_seconds = self.timer_task.elapsed_seconds + self.get_current_sitting_seconds()
 
@@ -1644,6 +1659,7 @@ class RevisionPlannerApp:
             self.log_out()
 
     def log_out(self):
+        self.save_timer_sitting_if_active()
         self.current_week_start = None
         self.current_month_start = None
         self.stats_view_mode = "weekly"
@@ -1657,14 +1673,19 @@ class RevisionPlannerApp:
 
         item = tk.Label(sidebar, text=label, bg=item_bg, fg=item_fg, font=F(10), anchor="w", padx=14, pady=9, cursor="hand2")
         item.pack(fill="x", padx=6, pady=2, side=position)
-        item.bind("<Button-1>", lambda event: command())
+        item.bind("<Button-1>", lambda event: self.navigate_from_sidebar(command))
 
         if not is_active:
             item.bind("<Enter>", lambda event: item.config(bg=hover_bg))
             item.bind("<Leave>", lambda event: item.config(bg=item_bg))
 
+    def on_close(self):
+        self.save_timer_sitting_if_active()
+        self.root.destroy()
+
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = RevisionPlannerApp(root)
+    root.protocol("WM_DELETE_WINDOW", app.on_close)
     root.mainloop()

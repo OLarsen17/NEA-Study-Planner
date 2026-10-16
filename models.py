@@ -56,6 +56,7 @@ class Settings: #simple version to be reference from user
         self.high_contrast = False
         self.reminders_enabled = True
         self.reminder_days = 3
+        self.custom_colours = {}
 
     def to_dict(self):
         return {
@@ -63,7 +64,8 @@ class Settings: #simple version to be reference from user
             "font_size": self.font_size,
             "high_contrast": self.high_contrast,
             "reminders_enabled": self.reminders_enabled,
-            "reminder_days": self.reminder_days
+            "reminder_days": self.reminder_days,
+            "custom_colours": self.custom_colours
         }
 
     @staticmethod
@@ -74,6 +76,7 @@ class Settings: #simple version to be reference from user
         settings.high_contrast = data["high_contrast"]
         settings.reminders_enabled = data["reminders_enabled"]
         settings.reminder_days = data["reminder_days"]
+        settings.custom_colours = data.get("custom_colours", {})
         return settings
 
 

@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
+from tkinter import colorchooser
 
 from data_handler import load_users, save_users
 from models import User, Task, StudySession
 
 from datetime import datetime, timedelta
-
-from tkinter import ttk
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -90,10 +90,59 @@ COLOUR_LATER = PALETTES["light"]["LATER"]
 FONT_SCALES = {"small": 0.85, "medium": 1.0, "large": 1.25}
 
 
-def apply_theme(theme_name="light", high_contrast=False, font_size="medium"):
+CUSTOM_COLOUR_OPTIONS = [
+    ("BG", "Background"),
+    ("SIDEBAR", "Sidebar"),
+    ("CARD", "Cards and fields"),
+    ("ACCENT", "Buttons and highlights"),
+    ("TEXT_DARK", "Text"),
+]
+
+
+def mix(colour_a, colour_b, amount):
+    a = colour_a.lstrip("#")
+    b = colour_b.lstrip("#")
+    channels = []
+    for i in (0, 2, 4):
+        start = int(a[i:i + 2], 16)
+        end = int(b[i:i + 2], 16)
+        channels.append(round(start + (end - start) * amount))
+    return "#{:02x}{:02x}{:02x}".format(*channels)
+
+
+def is_light(colour):
+    c = colour.lstrip("#")
+    r, g, b = (int(c[i:i + 2], 16) for i in (0, 2, 4))
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 140
+
+
+def build_custom_palette(custom_colours):
+    palette = dict(PALETTES["light"])
+    palette.update(custom_colours)
+
+    bg = palette["BG"]
+    sidebar = palette["SIDEBAR"]
+    card = palette["CARD"]
+    accent = palette["ACCENT"]
+    text = palette["TEXT_DARK"]
+
+    palette["SIDEBAR_HOVER"] = mix(sidebar, "#000000" if is_light(sidebar) else "#ffffff", 0.07)
+    palette["ACCENT_HOVER"] = mix(accent, "#000000" if is_light(accent) else "#ffffff", 0.2)
+    palette["ACCENT_TEXT"] = "#000000" if is_light(accent) else "#ffffff"
+    palette["TEXT_MUTED"] = mix(text, bg, 0.4)
+    palette["CARD_BORDER"] = mix(card, text, 0.15)
+    palette["NEUTRAL"] = mix(bg, text, 0.08)
+    palette["NEUTRAL_HOVER"] = mix(bg, text, 0.16)
+    palette["LATER"] = accent
+    return palette
+
+
+def apply_theme(theme_name="light", high_contrast=False, font_size="medium", custom_colours=None):
     global FONT_SCALE
     if high_contrast:
         palette = PALETTES["high_contrast"]
+    elif theme_name == "custom":
+        palette = build_custom_palette(custom_colours or {})
     else:
         palette = PALETTES.get(theme_name, PALETTES["light"])
     globals().update({"COLOUR_" + key: value for key, value in palette.items()})
@@ -143,7 +192,7 @@ class RevisionPlannerApp:
 
     def apply_user_theme(self):
         settings = self.pending_user.settings
-        apply_theme(settings.theme, settings.high_contrast, settings.font_size)
+        apply_theme(settings.theme, settings.high_contrast, settings.font_size, settings.custom_colours)
         self.style_ttk_widgets()
 
     def apply_default_theme(self):
@@ -1052,9 +1101,11 @@ class RevisionPlannerApp:
         theme_label = tk.Label(inner, text="Theme", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9), anchor="w")
         theme_label.pack(fill="x")
         self.theme_var = tk.StringVar(value=settings.theme)
-        theme_menu = tk.OptionMenu(inner, self.theme_var, "light", "dark")
+        theme_menu = tk.OptionMenu(inner, self.theme_var, "light", "dark", "custom")
         self.style_option_menu(theme_menu)
         theme_menu.pack(anchor="w", pady=(2, 12))
+        customise_button = self.build_flat_button(inner, "Customise colours...", self.show_custom_theme_screen)
+        customise_button.pack(anchor="w", pady=(0, 12))
 
         font_size_label = tk.Label(inner, text="Font size", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(9), anchor="w")
         font_size_label.pack(fill="x")
@@ -1082,6 +1133,71 @@ class RevisionPlannerApp:
 
         save_button = self.build_flat_button(inner, "Save Settings", self.save_settings, accent=True)
         save_button.pack(anchor="w")
+
+    def show_custom_theme_screen(self):
+        self.clear_screen()
+
+        content = self.build_sidebar("Settings")
+
+        inner = tk.Frame(content, bg=COLOUR_BG)
+        inner.pack(fill="both", expand=True, padx=24, pady=18)
+
+        label = tk.Label(inner, text="Custom Colours", font=F(18, "bold"), bg=COLOUR_BG, fg=COLOUR_TEXT_DARK)
+        label.pack(anchor="w", pady=(0, 4))
+
+        hint_label = tk.Label(inner, text="Pick a colour for each part of the app. Hover colours and borders are worked out automatically.", font=F(9), bg=COLOUR_BG, fg=COLOUR_TEXT_MUTED, wraplength=520, justify="left", anchor="w")
+        hint_label.pack(anchor="w", pady=(0, 16))
+
+        self.custom_choices = {key: PALETTES["light"][key] for key, _ in CUSTOM_COLOUR_OPTIONS}
+        self.custom_choices.update(self.pending_user.settings.custom_colours)
+        self.custom_swatches = {}
+
+        for key, name in CUSTOM_COLOUR_OPTIONS:
+            row = tk.Frame(inner, bg=COLOUR_BG)
+            row.pack(fill="x", pady=4)
+
+            name_label = tk.Label(row, text=name, width=22, anchor="w", bg=COLOUR_BG, fg=COLOUR_TEXT_DARK, font=F(10))
+            name_label.pack(side="left")
+
+            swatch = tk.Label(row, bg=self.custom_choices[key], width=6, relief="solid", borderwidth=1)
+            swatch.pack(side="left", padx=10)
+            self.custom_swatches[key] = swatch
+
+            choose_button = self.build_flat_button(row, "Choose...", lambda k=key: self.choose_custom_colour(k))
+            choose_button.pack(side="left")
+
+        button_frame = tk.Frame(inner, bg=COLOUR_BG)
+        button_frame.pack(anchor="w", pady=(20, 0))
+
+        save_button = self.build_flat_button(button_frame, "Save colours", self.save_custom_colours, accent=True)
+        save_button.pack(side="left", padx=(0, 8))
+
+        reset_button = self.build_flat_button(button_frame, "Reset to defaults", self.reset_custom_colours)
+        reset_button.pack(side="left", padx=8)
+
+        cancel_button = self.build_flat_button(button_frame, "Cancel", self.show_settings_screen)
+        cancel_button.pack(side="left", padx=8)
+
+    def choose_custom_colour(self, key):
+        result = colorchooser.askcolor(color=self.custom_choices[key], title="Choose a colour")
+        if result[1] is None:
+            return
+        self.custom_choices[key] = result[1]
+        self.custom_swatches[key].config(bg=result[1])
+
+    def reset_custom_colours(self):
+        for key, _ in CUSTOM_COLOUR_OPTIONS:
+            self.custom_choices[key] = PALETTES["light"][key]
+            self.custom_swatches[key].config(bg=PALETTES["light"][key])
+
+    def save_custom_colours(self):
+        settings = self.pending_user.settings
+        settings.custom_colours = dict(self.custom_choices)
+        settings.theme = "custom"
+        self.save_current_user()
+        self.apply_user_theme()
+        messagebox.showinfo("Colours Saved", "Your custom colours have been saved.")
+        self.show_settings_screen()
 
     def save_settings(self):
         reminder_days_text = self.reminder_days_entry.get()

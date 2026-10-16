@@ -130,11 +130,18 @@
             }
         ],
         "settings": {
-            "theme": "light",
+            "theme": "dark",
             "font_size": "large",
             "high_contrast": false,
             "reminders_enabled": true,
-            "reminder_days": 3
+            "reminder_days": 3,
+            "custom_colours": {
+                "BG": "#ffb3ff",
+                "SIDEBAR": "#ff80ff",
+                "CARD": "#ffc6ff",
+                "ACCENT": "#ff33ff",
+                "TEXT_DARK": "#ffaeff"
+            }
         },
         "created_date": "2026-09-04"
     },
@@ -172,7 +179,8 @@
             "font_size": "medium",
             "high_contrast": false,
             "reminders_enabled": true,
-            "reminder_days": 3
+            "reminder_days": 3,
+            "custom_colours": {}
         },
         "created_date": "2026-09-14"
     },
@@ -186,7 +194,8 @@
             "font_size": "medium",
             "high_contrast": false,
             "reminders_enabled": true,
-            "reminder_days": 3
+            "reminder_days": 3,
+            "custom_colours": {}
         },
         "created_date": "2026-09-30"
     },
@@ -227,7 +236,8 @@
             "font_size": "large",
             "high_contrast": false,
             "reminders_enabled": true,
-            "reminder_days": 3
+            "reminder_days": 3,
+            "custom_colours": {}
         },
         "created_date": "2026-10-14"
     }
